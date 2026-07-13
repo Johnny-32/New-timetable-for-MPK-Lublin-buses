@@ -181,9 +181,9 @@ for i in range(len(table_hour_list_container)):
 
 # Calculating approximate frequencies
 # The algorithm will work by:
-# 1. Reading values of two columns at a time and then calculating the frequency by subtracting each minute with the next 
-# and adding 60 to the result if it's a non-positive number, so the algorithm works with subtracting minutes that are associated with diffrent hours,
-# results will be stored in a dictionary with key that indicates hours that the minutes were subtracted (ex. 5:09 and 5:39 -> 5: '30') (ex. 5:39 and 6:09 -> 5-6: '30')
+# 1. Reading values of two minute values at a time and then calculating the frequency by subtracting each minute with the next 
+# and adding 60 to the result if it's a non-positive number, so that the algorithm works with subtracting minutes that are associated with different hours,
+# results will be stored in a dictionary with key that indicates hours and minutes that the minutes were subtracted (ex. 5:09 and 5:39 -> '5:09 - 5:39': '30') (ex. 5:39 and 6:09 -> '5:39 - 6:09': '30')
 # ex. 1.1  6   mod 60 (59 - 29) = 30
 #         29
 #         59
@@ -193,15 +193,11 @@ for i in range(len(table_hour_list_container)):
 # 
 # 2. To have a x minute frequency label the line needs to have departures every x +- y minutes,
 # where x is the frequency and y is the tolerance for said frequency (there will be a data structure storing this data)
-# for ex. if a line has a 24 minute fruquency label it needs to have departures every 23-25 minutes if tolerance is 1 minute
+# for ex. if a line has a 24 minute fruquency label it needs to have departures every 23-25 minutes, if tolerance is 1 minute,
+# as a base a tolerance of 2 minutes will be used, but 
 # 
-# 3. The values will be calculated by reading values from two columns,
-#    if frequencies couldnt be made with operations made in 2. searching for frequency will be divided into two seperate column (frequency for each hour)
-# 
-# 
-# 4. If a frequency can't be made operation in 3. the frequencies will be divided into smaller chunks (for ex. 2 results of subtraction)
-#    a frequency with higher tolerance will be attempted to be made (for example with +1 toleration),
-#    the first result of a subtraction will be a refference point for other res. of subtr. 
+# 3. The values will be calculated by reading two differences and calculating a mean from them,
+#    if a frequency couldn't be made with operations made in 2. searching for frequency will be done in these undefinied values by grouping differences into groups of 3 and calculating the mean of this group
 # 
 # 
 # The labels will be put into two main categories:
@@ -224,13 +220,23 @@ for i in range(len(table_hour_list_container)):
 #   NaN  59  NaN  NaN  50  NaN  50  NaN  50  NaN  53  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
 # 
 # In this example we will be sticking to hours 5-9
-# 1. Calculating results of subtraction
-# 37 - 05 = 32
-# 07 - 37 = -30 + 60 = 30
-# 34 - 07 = 27
-# 59 - 34 = 25
-# 26 - 59 = -33 + 60 = 27
-# 51 - 26 = 25
-# 15 - 51 = -36 + 60 = 24
-# 38 - 15 = 23
-# Resulting dictionary is: ...
+# 1. Calculating differences
+# 5:37 - 5:05 = 32
+# 6:07 - 5:37 = -30 + 60 = 30
+# 6:34 - 6:07 = 27
+# 6:59 - 6:34 = 25
+# 7:26 - 6:59 = -33 + 60 = 27
+# 7:51 - 7:26 = 25
+# 8:15 - 7:51 = -36 + 60 = 24
+# 8:38 - 8:15 = 23
+# 9:02 - 8:38 = 24
+# 9:26 - 9:02 = 24
+# 9:50 - 9:26 = 24
+# 
+# So using our common sense we can see that frequencies are:
+# 5:05 - 6:07 --- 30 minutes
+# 6:07 - 7:51 --- it makes to make it 24 minutes, but in reality it's ~26 minutes
+# 7:51 - 9:50 --- 24 minutes
+# 
+# 
+# ??? Maybe add calculating frequencies by getting the timetable from the first stop of a route, beacuse the departures there are more consistent
