@@ -142,6 +142,8 @@ for i in range(len(table_hour_list_container)):
 
 # Shortening the number of columns (ex. if hour 10, 11, 12 have the same departure minutes we can combine them into one column 10-12)
 
+df_list_short = []
+
 for idx in range(len(df_list)):
     current_df = df_list[idx]
     cols = list(current_df.columns)
@@ -169,7 +171,7 @@ for idx in range(len(df_list)):
         new_df_data[new_name] = current_df[start_col]
         i = j
 
-    df_list[idx] = pd.DataFrame(new_df_data)
+    df_list_short.append(pd.DataFrame(new_df_data))
 
 # Printing dataframes to the console
 

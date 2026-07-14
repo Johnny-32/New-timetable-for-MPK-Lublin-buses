@@ -115,20 +115,45 @@ import timetable
 #     print(timetable.df_list[i])
 #     print("\n")
 
-difference_list = []
+minute_list_container = []
+difference_list_container = []
 
 for idx in range(len(timetable.df_list)):
     current_df = timetable.df_list[idx]
+    # print(current_df)
     cols = list(current_df.columns)
+    # print(cols)
     column_counter = 0
-    while column_counter < len(cols) - 1:
-        minute_in_a_column = 0
-        while minute_in_a_column < len(cols[column_counter]) - 1:
-            difference_between_two_minutes = int(cols[minute_in_a_column + 1]) - int(cols[minute_in_a_column]) # To fix
-            difference = current_df[difference_between_two_minutes]
-            difference_list.append(difference)
-            minute_in_a_column += 1
-        column_counter += 1
 
-    print(difference_list)
-    print("/n")        
+    minute_list = []
+    difference_list = []
+
+
+    for key, value in current_df.items():
+        for minute in value:
+            minute_list.append((key, minute))
+    minute_list_container.append(minute_list)
+
+    current_minute_list = minute_list_container[idx]
+
+    for idx_m in range(len(current_minute_list) - 1):
+        current_hour, current_minute = current_minute_list[idx_m]
+        next_hour, next_minute = current_minute_list[idx_m + 1]
+        difference = next_minute - current_minute
+        if difference <= 0 and : # What if the departures are 12:30 and 13:45
+
+
+    # while column_counter < len(cols):
+        # minute_in_a_column = 0
+        # while minute_in_a_column < len(cols[column_counter]) - 1:
+            # print(cols[minute_in_a_column])
+            # difference_between_two_minutes = int(cols[minute_in_a_column + 1]) - int(cols[minute_in_a_column])
+            # print(difference_between_two_minutes)
+            # difference = current_df[difference_between_two_minutes]
+            # difference_list.append(difference)
+            # minute_in_a_column += 1
+        # column_counter += 1
+
+
+    # print(difference_list)
+    # print("/n")        
