@@ -114,6 +114,7 @@ minute_list_container = []
 difference_list_container = []
 difference_list_container = []
 group_list_for_a_timetable_period_container = []
+not_matched_index_list_container = []
 tolerance = 2
 predefined_frequency_list = [15, 20, 24, 30, 40, 45, 60]
 
@@ -150,7 +151,7 @@ for idx in range(len(timetable.df_list)):
 
     current_difference_list = difference_list_container[idx]
     group_list_for_a_timetable_period = []
-    not_matched_list = []
+    not_matched_index_list = []
 
     current_group = []
     current_matched_freq = None
@@ -173,11 +174,23 @@ for idx in range(len(timetable.df_list)):
             current_group.append(current_item)
             current_matched_freq = matched_freq
         else:
-            not_matched_list.append(current_item)
+            if current_group:
+                group_list_for_a_timetable_period.append(current_group)
+                current_group = []
+            
+            group_list_for_a_timetable_period.append(current_item)
+
+            idx_sublist = len(group_list_for_a_timetable_period) - 1
+            not_matched_index_list.append(idx_sublist)
+
+            current_matched_freq = None
 
     if current_group:
         group_list_for_a_timetable_period.append(current_group)
 
     group_list_for_a_timetable_period_container.append(group_list_for_a_timetable_period)
+    not_matched_index_list_container.append(not_matched_index_list)
 
-print(f"{group_list_for_a_timetable_period_container[0]}\n")
+
+print(f"Groups:\n{group_list_for_a_timetable_period_container[0]}\n")
+print(f"Indexes of not matched elements:\n{not_matched_index_list_container[0]}")
