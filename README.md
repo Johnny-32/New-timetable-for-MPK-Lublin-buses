@@ -9,7 +9,8 @@ This project is centered around a single python file that has diffrent functions
 - Getting an .html file from the MPK Lublin website using [requests](https://pypi.org/project/requests/)
 - Parsing a table from an .html file using [Beautiful Soup](https://beautiful-soup-4.readthedocs.io/en/latest/)
 - Preparing the data for conversion to a [Pandas](https://pandas.pydata.org/docs/index.html) dataframe
-- Deleting unnecessary columns, so that the timetable is simpler and takes less space 
+- Deleting unnecessary columns, so that the timetable is simpler and takes less space
+- Calculating frequencies on the specific line, the stop and time of day, using my own algorithm
 
 ## To do:
 - Move frequency documentation to a separate .md file
@@ -24,4 +25,4 @@ This project is centered around a single python file that has diffrent functions
 - Maybe - Add realtime departure board for stops and for routes 
 
 ## Usage
-As of now just download main.py file and run it however you like (CLI, Text editor, IDE).
+Will be updated in the future.
