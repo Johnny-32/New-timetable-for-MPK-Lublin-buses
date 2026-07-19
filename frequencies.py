@@ -8,6 +8,7 @@ difference_list_container = []
 group_list_for_a_timetable_period_container = []
 not_matched_index_list_container = []
 matched_frequency_list_container = []
+breakpoint_list_container = []
 tolerance = 2
 predefined_frequency_list = [15, 20, 24, 30, 40, 45, 60]
 
@@ -196,5 +197,49 @@ for idx in range(len(timetable.df_list)):
 
     matched_frequency_list_container.append(matched_frequency_list)
 
-for i in range(len(group_list_for_a_timetable_period_container[0])):
-    print(f"Group with frequency - {matched_frequency_list_container[0][i]}:\n{group_list_for_a_timetable_period_container[0][i]}\n")
+    # Making a list for breakpoints (timestamps when frequncies change)
+
+    # print(current_group_list)
+    # break
+
+    breakpoint_list = []
+    
+    first_elem_in_first_group = current_group_list[0][0]
+    first_elem_in_first_group_two_timestamps, first_elem_in_first_group_difference = first_elem_in_first_group
+    first_elem_in_first_group_timestamp_list = first_elem_in_first_group_two_timestamps.split("-")
+    first_elem_in_first_group_first_timestamp = first_elem_in_first_group_timestamp_list[0]
+    breakpoint_list.append(first_elem_in_first_group_first_timestamp)
+    
+
+    for idx_gr in range(len(current_group_list)):
+        last_elem_in_group = current_group_list[idx_gr][-1]
+        last_elem_in_group_two_timestamps, last_elem_in_group_difference = last_elem_in_group
+        last_elem_in_group_timestamp_list = last_elem_in_group_two_timestamps.split("-")
+        last_elem_in_group_second_timestamp = last_elem_in_group_timestamp_list[1]
+        breakpoint_list.append(last_elem_in_group_second_timestamp)
+
+    breakpoint_list_container.append(breakpoint_list)
+
+    print(f"Timetable nr {idx}")
+    for idx_fr in range(len(breakpoint_list) + len(matched_frequency_list)):
+        if idx_fr % 2 == 0:
+            print(breakpoint_list[idx_fr // 2])
+        else:
+            print(matched_frequency_list[idx_fr // 2])
+    print("\n")
+            
+
+    # print(breakpoint_list)
+    # break
+        
+    # print("\n\n")
+
+        
+        # for current_item in current_group:
+        #     current_two_timestamps, current_difference = current_item
+            # print(current_two_timestamps)
+            # print()
+
+
+# for i in range(len(group_list_for_a_timetable_period_container[0])):
+#     print(f"Group with frequency - {matched_frequency_list_container[0][i]}:\n{group_list_for_a_timetable_period_container[0][i]}\n")
