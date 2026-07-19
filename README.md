@@ -13,7 +13,7 @@ This project is centered around a single python file that has diffrent functions
 - Calculating frequencies on the specific line, the stop and time of day, using my own algorithm
 
 ## To do:
-- Finish moving documentation from frequencies.py to frequencies.md
+- Add showing frequency in a pretty format with breakpoints for ex. (start - frequency - breakpoint - frequency - breakpoint - frequency - end)
 - Test frequency algorithm on a variety of MPK Lublin lines and stops (including these in non-holiday timetables)
 - Make an algorithm that will calculate frequencies depending on the time of day (and in the future add frequencies to the timetable), maybe put in a seperate .py file
 - Make a tier list with bus lines (seperate tier list for each time ex. weekdays and then maybe group them into categories for ex. key lines have a frequency of 15 minutes during rush hour, 30 minutes on saturdays...)
