@@ -180,3 +180,13 @@ for idx in range(len(df_list)):
 #     with pd.option_context('display.max_columns', None):
 #         print(df_list[i])
 #     print("\n")
+
+html_tables = []
+for i, df in enumerate(df_list):
+    table_html = df.to_html("index.html", table_id=f"timetable{i}", classes="MPK-Lublin-style-timetable")
+    html_tables.append(table_html)
+
+full_html_content = full_html_content = "\n<br>\n".join(html_tables)
+
+with open("index.html", "w", encoding="utf-8") as file:
+    file.write(full_html_content)
