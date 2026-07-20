@@ -18,11 +18,13 @@ This project is centered around a single python file that has diffrent functions
 - Make a python script, that will make a timetable in excel from a dynamic template
 - Make a tier list with bus lines (seperate tier list for each time ex. weekdays and then maybe group them into categories for ex. key lines have a frequency of 15 minutes during rush hour, 30 minutes on saturdays...)
 - A webiste that will display a specific timetable picked by an user (if it proves to be easy, I'll add a timetable conversion to PDF in an easy to print format)
-- Maybe - Add timetables in diffrent formats for example:
+
+### Maybr in a distant future
+- Add timetables in diffrent formats for example:
   - MPK Lublin style - with columns corresponding to diffrent hours
   - SL Stockholm style - one timetable for the whole line with departure times only for most important stops and departures that are read like a book (from left to right and top to bottom)
-- Maybe - a section that let's user pick two bus stops and then show all departures from A to B and B to A and their corresponding lengths (maybe I'll add a timer that will show time to a next departure)
-- Maybe - Add realtime departure board for stops and for routes 
+- A section that let's user pick two bus stops and then show all departures from A to B and B to A and their corresponding lengths (maybe I'll add a timer that will show time to a next departure)
+- Add realtime departure board for stops and for routes 
 
 ## Usage
 Will be updated in the future.
