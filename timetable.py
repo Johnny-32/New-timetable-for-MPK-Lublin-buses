@@ -34,9 +34,6 @@ span_list = [span.get_text() for span in span_list]
 
 table_list = soup.find_all('table')
 
-# table_0 = soup.find('table').prettify()
-# print(table_0)
-
 table_hour_list_th_temp = soup.find_all('th')
 table_hour_list_th_temp2 = [table_hour.get_text() for table_hour in table_hour_list_th_temp]
 table_hour_list_th = [table_hour.replace("\t", "").replace("\r", "").replace("\n", "") for table_hour in table_hour_list_th_temp2]
@@ -62,8 +59,6 @@ table_hour_list_container.append(table_hour_list)
 table_minute_list_td = soup.find_all("td")
 table_minute_list_td = [table_minute_one_hour_list.get_text() for table_minute_one_hour_list in table_minute_list_td]
 table_minute_list_td = [table_minute_one_hour_list.replace("\t", "").replace("\r", "").replace("\n", "") for table_minute_one_hour_list in table_minute_list_td]
-
-# print(table_minute_list_td)
 
 # Removing leading and trailing whitespaces
 
@@ -99,10 +94,6 @@ for table_minute_one_hour_list in table_minute_list_td:
 table_minute_list_td_clean.append(table_minute_list_one_schedule_td_clean)
 table_minute_list_one_schedule_td_clean = []
 
-# print(table_hour_list_container[0])
-# print("\n")
-# print(table_minute_list_td_clean[0])
-
 # Making dictionaries with hours as keys and list of minutes as values (ex. '5': ['00', '32', '59'])
 
 table_dict = []
@@ -110,8 +101,6 @@ table_dict_container = []
 for i in range(len(table_hour_list_container)):
     table_dict = dict(zip(table_hour_list_container[i], table_minute_list_td_clean[i]))
     table_dict_container.append(table_dict)
-
-# print(table_dict_container[0])
 
 # Adding Nan's to hours that don't have any departures
 
@@ -128,10 +117,6 @@ for table_dict in table_dict_container:
     for elem in table_dict.values():
         while len(elem) < m:
             elem.append(float("nan"))
-
-# print(table_dict_container)
-
-# print(table_dict_container[0])
 
 # Creating df's with header row and deleting indexes
 
@@ -173,20 +158,12 @@ for idx in range(len(df_list)):
 
     df_list_short.append(pd.DataFrame(new_df_data))
 
-# Printing dataframes to the console
-
-# for i in range(len(table_hour_list_container)):
-#     print(f"DATAFRAME {i}:")
-#     with pd.option_context('display.max_columns', None):
-#         print(df_list[i])
-#     print("\n")
-
 html_tables = []
 for i, df in enumerate(df_list):
-    table_html = df.to_html(table_id=f"timetable{i}", classes="MPK-Lublin-style-timetable")
+    table_html = df.to_html(table_id=f"timetable{i}", classes="MPK-Lublin-style-timetable", index=False)
     html_tables.append(table_html)
 
-html_all_tables = "\n<br>\n".join(html_tables)
+html_all_tables = "<br>".join(html_tables)
 
 html_file_path = "index.html"
 
