@@ -183,10 +183,24 @@ for idx in range(len(df_list)):
 
 html_tables = []
 for i, df in enumerate(df_list):
-    table_html = df.to_html("index.html", table_id=f"timetable{i}", classes="MPK-Lublin-style-timetable")
+    table_html = df.to_html(table_id=f"timetable{i}", classes="MPK-Lublin-style-timetable")
     html_tables.append(table_html)
 
-full_html_content = full_html_content = "\n<br>\n".join(html_tables)
+html_all_tables = "\n<br>\n".join(html_tables)
 
-with open("index.html", "w", encoding="utf-8") as file:
-    file.write(full_html_content)
+html_file_path = "index.html"
+
+with open(html_file_path, "r", encoding="utf-8") as f:
+    existing_html = f.read()
+
+timetable_soup = BeautifulSoup(existing_html, "html.parser")
+target_div = timetable_soup.find(id="table-div")
+
+if target_div:
+    target_div.clear()
+
+    table_soup = BeautifulSoup(html_all_tables, "html.parser")
+    target_div.append(table_soup)
+
+    with open(html_file_path, "w", encoding="utf-8") as f:
+        f.write(str(timetable_soup))
