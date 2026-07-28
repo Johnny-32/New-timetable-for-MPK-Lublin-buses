@@ -158,6 +158,14 @@ for idx in range(len(df_list)):
 
     df_list_short.append(pd.DataFrame(new_df_data))
 
+# Transposing df's
+
+df_list_transposed = []
+for idx in range(len(df_list)):
+    df_list_transposed.append(df_list[idx].transpose())
+
+# Exporting df's to html
+
 html_tables = []
 for i, df in enumerate(df_list):
     table_html = df.to_html(table_id=f"timetable{i}", classes="MPK-Lublin-style-timetable", index=False)
