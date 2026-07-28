@@ -1,6 +1,7 @@
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+import inspect
 
 url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 
@@ -166,26 +167,38 @@ for idx in range(len(df_list)):
 
 # Exporting df's to html
 
-html_tables = []
-for i, df in enumerate(df_list):
-    table_html = df.to_html(table_id=f"timetable{i}", classes="MPK-Lublin-style-timetable", index=False)
-    html_tables.append(table_html)
+def export_to_html(df_list, is_transposed=False, is_short=False):
 
-html_all_tables = "<br>".join(html_tables)
+    html_tables = []
+    is_index = False
+    is_header = True
 
-html_file_path = "index.html"
+    if is_transposed:
+        is_index = True
+        is_header = False
 
-with open(html_file_path, "r", encoding="utf-8") as f:
-    existing_html = f.read()
+    for i, df in enumerate(df_list):
+        table_html = df.to_html(table_id=f"timetable{i}", classes="MPK-Lublin-style-timetable", index=is_index, header=is_header)
+        html_tables.append(table_html)
 
-timetable_soup = BeautifulSoup(existing_html, "html.parser")
-target_div = timetable_soup.find(id="table-div")
+    html_all_tables = "<br>".join(html_tables)
 
-if target_div:
-    target_div.clear()
+    html_file_path = "index.html"
 
-    table_soup = BeautifulSoup(html_all_tables, "html.parser")
-    target_div.append(table_soup)
+    with open(html_file_path, "r", encoding="utf-8") as f:
+        existing_html = f.read()
 
-    with open(html_file_path, "w", encoding="utf-8") as f:
-        f.write(str(timetable_soup))
+    timetable_soup = BeautifulSoup(existing_html, "html.parser")
+    target_div = timetable_soup.find(id="table-div")
+
+    if target_div:
+        target_div.clear()
+
+        table_soup = BeautifulSoup(html_all_tables, "html.parser")
+        target_div.append(table_soup)
+
+        with open(html_file_path, "w", encoding="utf-8") as f:
+            f.write(str(timetable_soup))
+
+
+export_to_html(df_list_transposed, is_transposed=True)
