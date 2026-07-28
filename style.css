@@ -1,7 +1,11 @@
 table {
     border: none;
+    border-collapse: collapse;
 }
 
+th, td {
+    border: none;
+}
 
 tr:nth-child(odd){
     background-color: gray;
