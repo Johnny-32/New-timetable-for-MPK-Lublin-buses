@@ -6,7 +6,7 @@ This project aims to make a better looking and simpler timetable for MPK Lublin 
 - Flask (in the future)
 
 ## How it works
-This project is centered around a single python file that has diffrent functions:
+This project is centered around a single python file that has different functions:
 - Getting an .html file from the MPK Lublin website using [requests](https://pypi.org/project/requests/)
 - Parsing a table from an .html file using [Beautiful Soup](https://beautiful-soup-4.readthedocs.io/en/latest/)
 - Preparing the data for conversion to a [Pandas](https://pandas.pydata.org/docs/index.html) dataframe
@@ -14,15 +14,16 @@ This project is centered around a single python file that has diffrent functions
 - Calculating frequencies on the specific line, the stop and time of day, using my own algorithm
 
 ## To do:
-- Make a template for a timetable design based on MPK Lublin in Excel
+- Make functions for making df_list, df_list_transposed, df_list_short, and make it so that def make_df_list_transposed uses make_df_list inside the function
+- Make a Vienna style timetable, then a variation of Munich's, and maybe make a Copenhagen style timetable for the whole route
 - Test frequency algorithm on a variety of MPK Lublin lines and stops (including these in non-holiday timetables)
 - Make a python script, that will make a timetable in excel from a dynamic template
-- Make a tier list with bus lines (seperate tier list for each time ex. weekdays and then maybe group them into categories for ex. key lines have a frequency of 15 minutes during rush hour, 30 minutes on saturdays...)
-- A webiste that will display a specific timetable picked by an user (if it proves to be easy, I'll add a timetable conversion to PDF in an easy to print format)
+- Make a tier list with bus lines (separate tier list for each time ex. weekdays and then maybe group them into categories for ex. key lines have a frequency of 15 minutes during rush hour, 30 minutes on saturdays...)
+- A website that will display a specific timetable picked by an user (if it proves to be easy, I'll add a timetable conversion to PDF in an easy to print format)
 
 ### Maybe in the distant future
-- Add timetables in diffrent formats for example:
-  - MPK Lublin style - with columns corresponding to diffrent hours
+- Add timetables in different formats for example:
+  - MPK Lublin style - with columns corresponding to different hours
   - SL Stockholm style - one timetable for the whole line with departure times only for most important stops and departures that are read like a book (from left to right and top to bottom)
 - A section that let's user pick two bus stops and then show all departures from A to B and B to A and their corresponding lengths (maybe I'll add a timer that will show time to a next departure)
 - Add realtime departure board for stops and for routes 
