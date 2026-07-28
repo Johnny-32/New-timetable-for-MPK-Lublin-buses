@@ -14,7 +14,8 @@ This project is centered around a single python file that has different function
 - Calculating frequencies on the specific line, the stop and time of day, using my own algorithm
 
 ## To do:
-- Make functions for making df_list, df_list_transposed, df_list_short, and make it so that def make_df_list_transposed uses make_df_list inside the function
+- Remove nan's (preferably in timetable.py)
+- Fix frequencies.py after adding functions in timetable.py
 - Make a Vienna style timetable, then a variation of Munich's, and maybe make a Copenhagen style timetable for the whole route
 - Test frequency algorithm on a variety of MPK Lublin lines and stops (including these in non-holiday timetables)
 - Make a python script, that will make a timetable in excel from a dynamic template
