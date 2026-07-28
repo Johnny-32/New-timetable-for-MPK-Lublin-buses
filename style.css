@@ -1,3 +1,8 @@
-tr {
-    
+table {
+    border: none;
+}
+
+
+tr:nth-child(odd){
+    background-color: gray;
 }

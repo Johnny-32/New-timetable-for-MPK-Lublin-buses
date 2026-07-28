@@ -1,169 +1,211 @@
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import inspect
 
-url = "https://mpk.lublin.pl/?przy=1022&lin=032"
+def make_a_span_list(url):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        response.encoding = "utf-8"
+        html_content = response.text
 
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-}
+    except requests.exceptions.HTTPError as errh:
+        print(f"Błąd HTTP (np. złe uprawnienia, brak strony): {errh}")
+    except requests.exceptions.ConnectionError as errc:
+        print(f"Błąd połączenia (np. problem z internetem, błędny URL): {errc}")
+    except requests.exceptions.Timeout as errt:
+        print(f"Serwer nie odpowiedział w określonym czasie: {errt}")
+    except requests.exceptions.RequestException as err:
+        print(f"Coś poszło nie tak: {err}")
 
-try:
-    response = requests.get(url, headers=headers, timeout=10)
-    response.raise_for_status()
-    response.encoding = "utf-8"
-    html_content = response.text
+    soup = BeautifulSoup(html_content, "html.parser")
 
-except requests.exceptions.HTTPError as errh:
-    print(f"Błąd HTTP (np. złe uprawnienia, brak strony): {errh}")
-except requests.exceptions.ConnectionError as errc:
-    print(f"Błąd połączenia (np. problem z internetem, błędny URL): {errc}")
-except requests.exceptions.Timeout as errt:
-    print(f"Serwer nie odpowiedział w określonym czasie: {errt}")
-except requests.exceptions.RequestException as err:
-    print(f"Coś poszło nie tak: {err}")
+    # Table titles
 
-soup = BeautifulSoup(html_content, "html.parser")
+    span_list = soup.find_all('span', class_="rozklad-title")
+    span_list = [span.get_text() for span in span_list]
 
-# Table titles
+    return span_list
 
-span_list = soup.find_all('span', class_="rozklad-title")
-span_list = [span.get_text() for span in span_list]
+def make_a_df_list(url):
 
-# Parsing table header row
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
 
-table_list = soup.find_all('table')
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        response.encoding = "utf-8"
+        html_content = response.text
 
-table_hour_list_th_temp = soup.find_all('th')
-table_hour_list_th_temp2 = [table_hour.get_text() for table_hour in table_hour_list_th_temp]
-table_hour_list_th = [table_hour.replace("\t", "").replace("\r", "").replace("\n", "") for table_hour in table_hour_list_th_temp2]
+    except requests.exceptions.HTTPError as errh:
+        print(f"Błąd HTTP (np. złe uprawnienia, brak strony): {errh}")
+    except requests.exceptions.ConnectionError as errc:
+        print(f"Błąd połączenia (np. problem z internetem, błędny URL): {errc}")
+    except requests.exceptions.Timeout as errt:
+        print(f"Serwer nie odpowiedział w określonym czasie: {errt}")
+    except requests.exceptions.RequestException as err:
+        print(f"Coś poszło nie tak: {err}")
 
-# Up to this point we have one list with all the headers, now i'm going to split this list into smaller sections, seperate for each table
+    soup = BeautifulSoup(html_content, "html.parser")
 
-table_hour_list_container = []
-table_hour_list = []
-godz_counter = 0
+    # Table titles
 
-for elem in table_hour_list_th:
-    if elem == "Godz.":
-        godz_counter += 1
-        if (godz_counter > 1):
-            table_hour_list_container.append(table_hour_list)
-            table_hour_list = []
-    else:
-        table_hour_list.append(elem)
-table_hour_list_container.append(table_hour_list)
+    span_list = soup.find_all('span', class_="rozklad-title")
+    span_list = [span.get_text() for span in span_list]
 
-# Parsing table contents
+    # Parsing table header row
 
-table_minute_list_td = soup.find_all("td")
-table_minute_list_td = [table_minute_one_hour_list.get_text() for table_minute_one_hour_list in table_minute_list_td]
-table_minute_list_td = [table_minute_one_hour_list.replace("\t", "").replace("\r", "").replace("\n", "") for table_minute_one_hour_list in table_minute_list_td]
+    table_list = soup.find_all('table')
 
-# Removing leading and trailing whitespaces
+    table_hour_list_th_temp = soup.find_all('th')
+    table_hour_list_th_temp2 = [table_hour.get_text() for table_hour in table_hour_list_th_temp]
+    table_hour_list_th = [table_hour.replace("\t", "").replace("\r", "").replace("\n", "") for table_hour in table_hour_list_th_temp2]
 
-table_minute_list_td = [table_minute_one_hour_list.strip() for table_minute_one_hour_list in table_minute_list_td]
-# print(table_minute_list_td)
+    # Up to this point we have one list with all the headers, now i'm going to split this list into smaller sections, seperate for each table
 
-# Dividing list elements into proper minute marks (ex. "003259" -> "00", "32", "59")
+    table_hour_list_container = []
+    table_hour_list = []
+    godz_counter = 0
 
-table_minute_list_td_clean = []
-table_minute_list_one_schedule_td_clean = []
-table_minute_list_one_hour_td_clean = []
-min_counter = 0
-
-for table_minute_one_hour_list in table_minute_list_td:
-    if table_minute_one_hour_list.isnumeric():
-        number_of_groups = len(table_minute_one_hour_list) // 2
-        for i in range(number_of_groups):
-            first_position = 2 * i
-            table_minute_list_one_hour_td_clean.append(table_minute_one_hour_list[first_position:first_position + 2])
-        table_minute_list_one_schedule_td_clean.append(table_minute_list_one_hour_td_clean)
-        table_minute_list_one_hour_td_clean = []
-    else:
-        if table_minute_one_hour_list:
-            min_counter += 1
-            if min_counter >= 2:
-                table_minute_list_td_clean.append(table_minute_list_one_schedule_td_clean)
-                table_minute_list_one_schedule_td_clean = []
+    for elem in table_hour_list_th:
+        if elem == "Godz.":
+            godz_counter += 1
+            if (godz_counter > 1):
+                table_hour_list_container.append(table_hour_list)
+                table_hour_list = []
         else:
-            table_minute_list_one_hour_td_clean.append(table_minute_one_hour_list)
+            table_hour_list.append(elem)
+    table_hour_list_container.append(table_hour_list)
+
+    # Parsing table contents
+
+    table_minute_list_td = soup.find_all("td")
+    table_minute_list_td = [table_minute_one_hour_list.get_text() for table_minute_one_hour_list in table_minute_list_td]
+    table_minute_list_td = [table_minute_one_hour_list.replace("\t", "").replace("\r", "").replace("\n", "") for table_minute_one_hour_list in table_minute_list_td]
+
+    # Removing leading and trailing whitespaces
+
+    table_minute_list_td = [table_minute_one_hour_list.strip() for table_minute_one_hour_list in table_minute_list_td]
+    # print(table_minute_list_td)
+
+    # Dividing list elements into proper minute marks (ex. "003259" -> "00", "32", "59")
+
+    table_minute_list_td_clean = []
+    table_minute_list_one_schedule_td_clean = []
+    table_minute_list_one_hour_td_clean = []
+    min_counter = 0
+
+    for table_minute_one_hour_list in table_minute_list_td:
+        if table_minute_one_hour_list.isnumeric():
+            number_of_groups = len(table_minute_one_hour_list) // 2
+            for i in range(number_of_groups):
+                first_position = 2 * i
+                table_minute_list_one_hour_td_clean.append(table_minute_one_hour_list[first_position:first_position + 2])
             table_minute_list_one_schedule_td_clean.append(table_minute_list_one_hour_td_clean)
             table_minute_list_one_hour_td_clean = []
+        else:
+            if table_minute_one_hour_list:
+                min_counter += 1
+                if min_counter >= 2:
+                    table_minute_list_td_clean.append(table_minute_list_one_schedule_td_clean)
+                    table_minute_list_one_schedule_td_clean = []
+            else:
+                table_minute_list_one_hour_td_clean.append(table_minute_one_hour_list)
+                table_minute_list_one_schedule_td_clean.append(table_minute_list_one_hour_td_clean)
+                table_minute_list_one_hour_td_clean = []
 
-table_minute_list_td_clean.append(table_minute_list_one_schedule_td_clean)
-table_minute_list_one_schedule_td_clean = []
+    table_minute_list_td_clean.append(table_minute_list_one_schedule_td_clean)
+    table_minute_list_one_schedule_td_clean = []
 
-# Making dictionaries with hours as keys and list of minutes as values (ex. '5': ['00', '32', '59'])
+    # Making dictionaries with hours as keys and list of minutes as values (ex. '5': ['00', '32', '59'])
 
-table_dict = []
-table_dict_container = []
-for i in range(len(table_hour_list_container)):
-    table_dict = dict(zip(table_hour_list_container[i], table_minute_list_td_clean[i]))
-    table_dict_container.append(table_dict)
+    table_dict = []
+    table_dict_container = []
+    for i in range(len(table_hour_list_container)):
+        table_dict = dict(zip(table_hour_list_container[i], table_minute_list_td_clean[i]))
+        table_dict_container.append(table_dict)
 
-# Adding Nan's to hours that don't have any departures
+    # Adding Nan's to hours that don't have any departures
 
-for table_dict in table_dict_container:
-    for key, elem in table_dict.items():
-        if len(elem) == 1 and '' in elem:
-            table_dict[key] = [float('nan')]
+    for table_dict in table_dict_container:
+        for key, elem in table_dict.items():
+            if len(elem) == 1 and '' in elem:
+                table_dict[key] = [float('nan')]
 
 
-# Adding Nan's so that I can make a proper df, beacuse all lists must be of the same length
+    # Adding Nan's so that I can make a proper df, beacuse all lists must be of the same length
 
-for table_dict in table_dict_container:
-    m = len(max(table_dict.values(), key=len))
-    for elem in table_dict.values():
-        while len(elem) < m:
-            elem.append(float("nan"))
+    for table_dict in table_dict_container:
+        m = len(max(table_dict.values(), key=len))
+        for elem in table_dict.values():
+            while len(elem) < m:
+                elem.append(float("nan"))
 
-# Creating df's with header row and deleting indexes
+    # Creating df's with header row and deleting indexes
 
-df_list = []
-for i in range(len(table_hour_list_container)):
-    df_list.append(pd.DataFrame(table_dict_container[i]))
-    df_list[i].index = [''] * len(df_list[i])
+    df_list = []
+    for i in range(len(table_hour_list_container)):
+        df_list.append(pd.DataFrame(table_dict_container[i]))
+        df_list[i].index = [''] * len(df_list[i])
+
+    return df_list
 
 # Shortening the number of columns (ex. if hour 10, 11, 12 have the same departure minutes we can combine them into one column 10-12)
 
-df_list_short = []
+def make_a_df_list_short(url):
 
-for idx in range(len(df_list)):
-    current_df = df_list[idx]
-    cols = list(current_df.columns)
-    
-    new_df_data = {} 
-    
-    i = 0
-    while i < len(cols):
-        start_col = cols[i]
-        end_col = start_col
+    df_list = make_a_df_list(url)
+
+    df_list_short = []
+
+    for idx in range(len(df_list)):
+        current_df = df_list[idx]
+        cols = list(current_df.columns)
         
-        j = i + 1
-        while j < len(cols):
-            if current_df[start_col].equals(current_df[cols[j]]):
-                end_col = cols[j]
-                j += 1
-            else:
-                break
+        new_df_data = {} 
         
-        if start_col != end_col:
-            new_name = f"{start_col}-{end_col}"
-        else:
-            new_name = str(start_col)
+        i = 0
+        while i < len(cols):
+            start_col = cols[i]
+            end_col = start_col
             
-        new_df_data[new_name] = current_df[start_col]
-        i = j
+            j = i + 1
+            while j < len(cols):
+                if current_df[start_col].equals(current_df[cols[j]]):
+                    end_col = cols[j]
+                    j += 1
+                else:
+                    break
+            
+            if start_col != end_col:
+                new_name = f"{start_col}-{end_col}"
+            else:
+                new_name = str(start_col)
+                
+            new_df_data[new_name] = current_df[start_col]
+            i = j
 
-    df_list_short.append(pd.DataFrame(new_df_data))
+        df_list_short.append(pd.DataFrame(new_df_data))
+
+    return df_list_short
 
 # Transposing df's
 
-df_list_transposed = []
-for idx in range(len(df_list)):
-    df_list_transposed.append(df_list[idx].transpose())
+def make_a_df_list_transposed(url):
+
+    df_list = make_a_df_list(url)
+
+    df_list_transposed = []
+    for idx in range(len(df_list)):
+        df_list_transposed.append(df_list[idx].transpose())
+
+    return df_list_transposed
 
 # Exporting df's to html
 
@@ -189,16 +231,17 @@ def export_to_html(df_list, is_transposed=False, is_short=False):
         existing_html = f.read()
 
     timetable_soup = BeautifulSoup(existing_html, "html.parser")
-    target_div = timetable_soup.find(id="table-div")
+    target_table_div = timetable_soup.find(id="table-div")
 
-    if target_div:
-        target_div.clear()
+    if target_table_div:
+        target_table_div.clear()
 
         table_soup = BeautifulSoup(html_all_tables, "html.parser")
-        target_div.append(table_soup)
+        target_table_div.append(table_soup)
 
         with open(html_file_path, "w", encoding="utf-8") as f:
             f.write(str(timetable_soup))
 
-
+url = "https://mpk.lublin.pl/?przy=1022&lin=032"
+df_list_transposed = make_a_df_list_transposed(url)
 export_to_html(df_list_transposed, is_transposed=True)

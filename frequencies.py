@@ -1,6 +1,5 @@
-from timetable import df_list, span_list
+from timetable import make_a_df_list, make_a_span_list, url
 from math import isnan
-
 
 minute_list_container = []
 difference_list_container = []
@@ -11,6 +10,9 @@ matched_frequency_list_container = []
 breakpoint_list_container = []
 tolerance = 2
 predefined_frequency_list = [15, 20, 24, 30, 40, 45, 60]
+
+df_list = make_a_df_list(url)
+span_list = make_a_span_list(url)
 
 for idx in range(len(df_list)):
     current_df = df_list[idx]
