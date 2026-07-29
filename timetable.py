@@ -220,7 +220,7 @@ def export_to_html(df_list, is_transposed=False, is_short=False):
         is_header = False
 
     for i, df in enumerate(df_list):
-        table_html = df.to_html(table_id=f"timetable{i}", classes="MPK-Lublin-style-timetable", index=is_index, header=is_header)
+        table_html = df.to_html(table_id=f"timetable{i}", classes="Vienna-style-timetable", index=is_index, header=is_header)
         html_tables.append(table_html)
 
     html_all_tables = "<br>".join(html_tables)
@@ -231,12 +231,20 @@ def export_to_html(df_list, is_transposed=False, is_short=False):
         existing_html = f.read()
 
     timetable_soup = BeautifulSoup(existing_html, "html.parser")
+
     target_table_div = timetable_soup.find(id="table-div")
 
     if target_table_div:
         target_table_div.clear()
 
         table_soup = BeautifulSoup(html_all_tables, "html.parser")
+
+        # Removing cells with Nan's
+
+        for td in table_soup.find_all("td"):
+            if td.text .strip()== "NaN":
+                td.decompose()
+
         target_table_div.append(table_soup)
 
         with open(html_file_path, "w", encoding="utf-8") as f:

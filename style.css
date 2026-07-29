@@ -1,12 +1,14 @@
-table {
+table.Vienna-style-timetable {
+    text-align: right;
     border: none;
     border-collapse: collapse;
-}
 
-th, td {
-    border: none;
-}
+    th, td {
+        border: none;
+        padding: 0.1rem 0.25rem;
+    }
 
-tr:nth-child(odd){
-    background-color: gray;
+    tr:nth-child(odd){
+        background-color: gray;
+    }
 }
