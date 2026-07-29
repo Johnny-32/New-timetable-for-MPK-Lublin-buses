@@ -3,6 +3,7 @@ This project aims to make a better looking and simpler timetable for MPK Lublin 
 
 ## Technologies
 - Python 3.14
+- HTML, CSS
 - Flask (in the future)
 
 ## How it works
