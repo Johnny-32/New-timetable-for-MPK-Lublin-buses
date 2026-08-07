@@ -13,11 +13,14 @@ This project is centered around a single python file that has different function
 - Calculating frequencies on the specific line, the stop and time of day, using my own algorithm
 
 ## To do:
+- Add spans and other data for the timetable
 - See if shortened and transposed timetbales can be made from lists of dicts instead of df's
 - Make a Vienna style timetable, then a variation of Munich's, and maybe make a Copenhagen style timetable for the whole route
 - Test frequency algorithm on a variety of MPK Lublin lines and stops (including these in non-holiday timetables)
+- A website that will display a specific timetable picked by an user, in an html format with an option to export to pdf in a print-friendly format
+- Add retrieving data from GTFS instead of .html
 - Make a tier list with bus lines (separate tier list for each time ex. weekdays and then maybe group them into categories for ex. key lines have a frequency of 15 minutes during rush hour, 30 minutes on saturdays...)
-- A website that will display a specific timetable picked by an user (if it proves to be easy, I'll add a timetable conversion to PDF in an easy to print format)
+
 
 ### Maybe in the distant future
 - Add timetables in different formats for example:
