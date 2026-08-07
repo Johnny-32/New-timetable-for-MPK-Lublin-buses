@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+    <title>Rozkład jazdy</title>
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+<header>
+    <p>{{ line }}</p>
+    <p>{{ destination }}</p>
+    <p>{{ stop }}</p>
+</header>
+<main>
+    {% for table_dict in table_dict_list %}
+    <table class="Vienna-style-timetable">
+        {% for hour, minutes in table_dict.items() %}
+        <tr>
+            <td>{{ hour }}</td>
+            {% for minute in minutes %}
+            <td>{{ minute }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+</main>
+</body>
+</html>
