@@ -225,7 +225,7 @@ def export_to_html(df_list, is_transposed=False, is_short=False):
 
     html_all_tables = "<br>".join(html_tables)
 
-    html_file_path = "index.html"
+    html_file_path = "../web/index.html"
 
     with open(html_file_path, "r", encoding="utf-8") as f:
         existing_html = f.read()

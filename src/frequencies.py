@@ -1,4 +1,4 @@
-from timetable import make_a_df_list, make_a_span_list, url
+from src.timetable import make_a_df_list, make_a_span_list, url
 from math import isnan
 
 minute_list_container = []
