@@ -6,7 +6,6 @@ This project aims to make a better looking and simpler timetable for MPK Lublin 
 - HTML, CSS
 
 ## How it works
-This project is centered around a single python file that has different functions:
 - Getting an .html file from the MPK Lublin website using [requests](https://pypi.org/project/requests/)
 - Parsing a table from an .html file using [Beautiful Soup](https://beautiful-soup-4.readthedocs.io/en/latest/)
 - Manipulating the data, so that it can be exported to html using [Jinja2](https://jinja.palletsprojects.com/)
