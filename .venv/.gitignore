@@ -1,0 +1,5 @@
+.venv/
+CACHEDIR.TAG
+
+.idea/
+__pycache__
