@@ -1,5 +1,11 @@
 .venv/
+
 CACHEDIR.TAG
 
 .idea/
 __pycache__
+
+*.lock
+!.lock
+# Keep official lockfiles tracked, ignore temporary ones:
+!.uv.lock
