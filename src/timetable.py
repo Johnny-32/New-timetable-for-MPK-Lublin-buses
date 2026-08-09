@@ -110,10 +110,7 @@ def make_a_dict_list(url):
 
     return table_dict_list
 
-def tuples_match_except_keys(d1, d2):
-    key1, value1 = d1
-    key2, value2 = d2
-    return value1 == value2
+# Shortening the number of columns (ex. if hour 10, 11, 12 have the same departure minutes we can combine them into one column 10-12)
 
 def make_a_dict_list_short(url):
     dict_container = make_a_dict_list(url)
@@ -122,7 +119,7 @@ def make_a_dict_list_short(url):
     for current_dict_list in dict_container:
         current_tuple_list = list(current_dict_list.items())
 
-        new_tuple_list = []
+        new_dict = {}
         i = 0
         n = len(current_tuple_list)
 
@@ -130,102 +127,24 @@ def make_a_dict_list_short(url):
             start_tuple = current_tuple_list[i]
             j = i + 1
 
-            while j < n and tuples_match_except_keys(start_tuple, current_tuple_list[j]):
+            while j < n and start_tuple[1] == current_tuple_list[j][1]:
                 j += 1
 
             end_tuple = current_tuple_list[j - 1]
-            new_tuple = start_tuple
+            new_dict_key, new_dict_val = start_tuple
 
             if j - i > 1:
-                start_key, start_val = start_tuple
-                end_key, end_val = end_tuple
-                new_tuple = (f"{start_key}-{end_key}", start_val)
+                start_key, _ = start_tuple
+                end_key, _ = end_tuple
+                new_dict_key = f"{start_key}-{end_key}"
 
-            new_tuple_list.append(new_tuple)
+            new_dict[new_dict_key] = new_dict_val
+
             i = j
 
-        dict_container_short.append(new_tuple_list)
+        dict_container_short.append(new_dict)
 
     return dict_container_short
-
-
-def make_a_df_list(url):
-    table_dict_list = make_a_dict_list(url)
-
-    # Adding Nan's to hours that don't have any departures
-
-    for table_dict in table_dict_list:
-        for key, elem in table_dict.items():
-            if len(elem) == 1 and '' in elem:
-                table_dict[key] = [float('nan')]
-
-    # Adding Nan's so that I can make a proper df, because all lists must be of the same length
-
-    for table_dict in table_dict_list:
-        m = len(max(table_dict.values(), key=len))
-        for elem in table_dict.values():
-            while len(elem) < m:
-                elem.append(float("nan"))
-
-    # Creating df's with header row and deleting indexes
-
-    df_list = []
-    for i, table_dict in enumerate(table_dict_list):
-        df_list.append(pd.DataFrame(table_dict_list[i]))
-        df_list[i].index = [''] * len(df_list[i])
-
-    return df_list
-
-# Shortening the number of columns (ex. if hour 10, 11, 12 have the same departure minutes we can combine them into one column 10-12)
-
-def make_a_df_list_short(url):
-
-    df_list = make_a_df_list(url)
-
-    df_list_short = []
-
-    for idx in range(len(df_list)):
-        current_df = df_list[idx]
-        cols = list(current_df.columns)
-
-        new_df_data = {}
-
-        i = 0
-        while i < len(cols):
-            start_col = cols[i]
-            end_col = start_col
-
-            j = i + 1
-            while j < len(cols):
-                if current_df[start_col].equals(current_df[cols[j]]):
-                    end_col = cols[j]
-                    j += 1
-                else:
-                    break
-
-            if start_col != end_col:
-                new_name = f"{start_col}-{end_col}"
-            else:
-                new_name = str(start_col)
-
-            new_df_data[new_name] = current_df[start_col]
-            i = j
-
-        df_list_short.append(pd.DataFrame(new_df_data))
-
-    return df_list_short
-
-# Transposing df's
-
-def make_a_df_list_transposed(url):
-
-    df_list = make_a_df_list(url)
-
-    df_list_transposed = []
-    for idx in range(len(df_list)):
-        df_list_transposed.append(df_list[idx].transpose())
-
-    return df_list_transposed
 
 # Return a date that's either in an ISO format or in a dot format (DD.MM.YYYY)
 
@@ -255,10 +174,15 @@ def parse_destination(url):
 
     return soup.find("div", class_="rozklad-kierunek").text.split()[1]
 
-def parse_stop(url):
+def parse_stop_name(url):
     soup = make_a_request(url)
 
-    return soup.select_one("div.rozklad-przystanek > b > a").text.strip()
+    return soup.select_one("div.rozklad-przystanek > b > a").text.split("-")[1].strip()
+
+def parse_stop_id(url):
+    soup = make_a_request(url)
+
+    return soup.select_one("div.rozklad-przystanek > b > a").text.split("-")[0].strip()
 
 def export_to_template(url, output_path="../web/test.html"):
     with open("../web/template.html", encoding="utf-8") as f:
@@ -271,7 +195,8 @@ def export_to_template(url, output_path="../web/test.html"):
         street_names = parse_street_names(url),
         line = parse_line(url),
         destination = parse_destination(url),
-        stop = parse_stop(url)
+        stop_name = parse_stop_name(url),
+        stop_id = parse_stop_id(url)
     )
 
     with open(output_path, "w", encoding="utf-8") as f:
@@ -281,4 +206,4 @@ def export_to_template(url, output_path="../web/test.html"):
 
 url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 
-print(make_a_dict_list_short(url))
+export_to_template(url)

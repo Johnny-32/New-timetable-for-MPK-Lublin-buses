@@ -8,11 +8,12 @@
 </head>
 <body>
 <header>
-    <p>{{ timetable_valid_from }}</p>
-    <p>{{ line }}</p>
-    <p>{{ destination }}</p>
-    <p>{{ stop }}</p>
-    <p>{{ street_names }}</p>
+    <div>
+        <span class="colored-heading">{{ line }}</span>
+        <span class="colored-heading">{{ destination }}</span>
+    </div>
+    <span class="stop_name">{{ stop_name }}</span>
+    <span class="street_names">{{ street_names }}</span>
 </header>
 <main>
     {% for table_dict in table_dict_list %}
@@ -30,4 +31,8 @@
     {% endfor %}
 </main>
 </body>
+<footer>
+    <span>{{ timetable_valid_from }}</span>
+    <span>{{ stop_id }}</span>
+</footer>
 </html>

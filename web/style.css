@@ -8,7 +8,7 @@ table.Vienna-style-timetable {
         padding: 0.1rem 0.25rem;
     }
 
-    tr:nth-child(odd){
+    tr:nth-child(odd) {
         background-color: gray;
     }
 }
