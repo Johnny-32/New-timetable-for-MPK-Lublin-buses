@@ -187,48 +187,24 @@ def make_a_df_list_transposed(url):
 
     return df_list_transposed
 
-# Exporting df's to html
+# Return a date that's either in an ISO format or in a dot format (DD.MM.YYYY)
 
-# def export_to_html(df_list, is_transposed=False, is_short=False):
-#
-#     html_tables = []
-#     is_index = False
-#     is_header = True
-#
-#     if is_transposed:
-#         is_index = True
-#         is_header = False
-#
-#     for i, df in enumerate(df_list):
-#         table_html = df.to_html(table_id=f"timetable{i}", classes="Vienna-style-timetable", index=is_index, header=is_header)
-#         html_tables.append(table_html)
-#
-#     html_all_tables = "<br>".join(html_tables)
-#
-#     html_file_path = "../web/index.html"
-#
-#     with open(html_file_path, "r", encoding="utf-8") as f:
-#         existing_html = f.read()
-#
-#     timetable_soup = BeautifulSoup(existing_html, "html.parser")
-#
-#     target_table_div = timetable_soup.find(id="table-div")
-#
-#     if target_table_div:
-#         target_table_div.clear()
-#
-#         table_soup = BeautifulSoup(html_all_tables, "html.parser")
-#
-#         # Removing cells with Nan's
-#
-#         for td in table_soup.find_all("td"):
-#             if td.text.strip()== "NaN":
-#                 td.decompose()
-#
-#         target_table_div.append(table_soup)
-#
-#         with open(html_file_path, "w", encoding="utf-8") as f:
-#             f.write(str(timetable_soup))
+def parse_timetable_valid_from(url, iso_format = True):
+    soup = make_a_request(url)
+
+    temp = soup.select_one('div[align="right"]').text.split()[-1]
+
+    if iso_format:
+        return temp
+    else:
+        year, month, day = temp.split("-")
+        dot_format_date = f"{day}.{month}.{year}"
+        return dot_format_date
+
+def parse_street_names(url):
+    soup = make_a_request(url)
+
+    return soup.select_one("center > strong").text
 
 def parse_line(url):
     part_url = url.split("?")[1]
@@ -251,6 +227,8 @@ def export_to_template(url, output_path="../web/test.html"):
     html_out = template.render(
         table_dict_list = make_a_dict_list(url),
         span_list = make_a_span_list(url),
+        timetable_valid_from = parse_timetable_valid_from(url, iso_format=False),
+        street_names = parse_street_names(url),
         line = parse_line(url),
         destination = parse_destination(url),
         stop = parse_stop(url)
@@ -264,4 +242,4 @@ def export_to_template(url, output_path="../web/test.html"):
 
 url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 
-export_to_template(url)
+# print(parse_timetable_valid_from(url, iso_format=False))
