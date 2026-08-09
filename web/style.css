@@ -1,3 +1,16 @@
+* {
+    font-family: Inter, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-primary: white;
+    --bg-element: lightgray;
+    --highlight-color: navy;
+}
+
 table.Vienna-style-timetable {
     text-align: right;
     border: none;
@@ -9,6 +22,30 @@ table.Vienna-style-timetable {
     }
 
     tr:nth-child(odd) {
-        background-color: gray;
+        background-color: var(--bg-element);
     }
+}
+
+#route-info {
+    display: flex;
+    justify-content: flex-start;
+    background-color: var(--highlight-color);
+    color: var(--bg-primary);
+    width: fit-content;
+    gap: 0.5rem;
+}
+
+#location-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.timetable-period {
+    font-weight: bold;
+}
+
+footer {
+    display: flex;
+    gap: 1rem;
+    background-color: var(--bg-element);
 }

@@ -8,16 +8,18 @@
 </head>
 <body>
 <header>
-    <div>
+    <div id="route-info">
         <span class="colored-heading">{{ line }}</span>
         <span class="colored-heading">{{ destination }}</span>
     </div>
-    <span class="stop_name">{{ stop_name }}</span>
-    <span class="street_names">{{ street_names }}</span>
+    <div id="location-info">
+        <span id="stop_name">{{ stop_name }}</span>
+        <span id="street_names">{{ street_names }}</span>
+    </div>
 </header>
 <main>
     {% for table_dict in table_dict_list %}
-    {{ span_list[loop.index0] }}
+    <span class="timetable-period">{{ span_list[loop.index0] }}</span>
     <table class="Vienna-style-timetable">
         {% for hour, minutes in table_dict.items() %}
         <tr>
