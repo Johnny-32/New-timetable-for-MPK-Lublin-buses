@@ -8,12 +8,15 @@
 </head>
 <body>
 <header>
+    <p>{{ timetable_valid_from }}</p>
     <p>{{ line }}</p>
     <p>{{ destination }}</p>
     <p>{{ stop }}</p>
+    <p>{{ street_names }}</p>
 </header>
 <main>
     {% for table_dict in table_dict_list %}
+    {{ span_list[loop.index0] }}
     <table class="Vienna-style-timetable">
         {% for hour, minutes in table_dict.items() %}
         <tr>

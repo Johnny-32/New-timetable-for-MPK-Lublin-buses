@@ -1,8 +1,11 @@
+from functools import lru_cache
+
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from jinja2 import Template
 
+@lru_cache(maxsize=32)
 def make_a_request(url):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -29,7 +32,7 @@ def make_a_span_list(url):
 
     return span_list
 
-def make_a_dict_list(url):
+def make_a_dict_list_container(url):
     soup = make_a_request(url)
 
     # Parsing table header row
@@ -100,16 +103,54 @@ def make_a_dict_list(url):
 
     # Making dictionaries with hours as keys and list of minutes as values (ex. '5': ['00', '32', '59'])
 
-    table_dict_list = []
+    table_dict_list_container = []
     for i in range(len(table_hour_list_container)):
-        table_dict = dict(zip(table_hour_list_container[i], table_minute_list_td_clean[i]))
-        table_dict_list.append(table_dict)
+        table_dict_list = dict(zip(table_hour_list_container[i], table_minute_list_td_clean[i]))
+        table_dict_list_container.append(table_dict_list)
 
-    return table_dict_list
+    return table_dict_list_container
+
+
+def make_a_dict_list_short(url):
+    dict_list_container = make_a_dict_list_container(url)
+
+    dict_list_container_short = []
+
+    for idx in range(len(dict_list_container)):
+        current_dict_list = dict_list_container[idx]
+
+    #     cols = list(current_df.columns)
+    #
+    #     new_df_data = {}
+    #
+    #     i = 0
+    #     while i < len(cols):
+    #         start_col = cols[i]
+    #         end_col = start_col
+    #
+    #         j = i + 1
+    #         while j < len(cols):
+    #             if current_df[start_col].equals(current_df[cols[j]]):
+    #                 end_col = cols[j]
+    #                 j += 1
+    #             else:
+    #                 break
+    #
+    #         if start_col != end_col:
+    #             new_name = f"{start_col}-{end_col}"
+    #         else:
+    #             new_name = str(start_col)
+    #
+    #         new_df_data[new_name] = current_df[start_col]
+    #         i = j
+    #
+    #     df_list_short.append(pd.DataFrame(new_df_data))
+    #
+    # return df_list_short
 
 
 def make_a_df_list(url):
-    table_dict_list = make_a_dict_list(url)
+    table_dict_list = make_a_dict_list_container(url)
 
     # Adding Nan's to hours that don't have any departures
 
@@ -117,7 +158,6 @@ def make_a_df_list(url):
         for key, elem in table_dict.items():
             if len(elem) == 1 and '' in elem:
                 table_dict[key] = [float('nan')]
-
 
     # Adding Nan's so that I can make a proper df, because all lists must be of the same length
 
@@ -225,7 +265,7 @@ def export_to_template(url, output_path="../web/test.html"):
         template = Template(f.read(), trim_blocks=True, lstrip_blocks=True)
 
     html_out = template.render(
-        table_dict_list = make_a_dict_list(url),
+        table_dict_list = make_a_dict_list_container(url),
         span_list = make_a_span_list(url),
         timetable_valid_from = parse_timetable_valid_from(url, iso_format=False),
         street_names = parse_street_names(url),
@@ -239,7 +279,6 @@ def export_to_template(url, output_path="../web/test.html"):
 
     return html_out
 
-
 url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 
-# print(parse_timetable_valid_from(url, iso_format=False))
+export_to_template(url)
