@@ -12,7 +12,7 @@ This project aims to make a better looking and simpler timetable for MPK Lublin 
 - Calculating frequencies on the specific line, the stop and time of day, using my own algorithm
 
 ## To do:
-- See if shortened and transposed timetables can be made from lists of dicts instead of df's
+- Fix make_dict_list_short so that it outputs dicts instead of lists
 - Make a Vienna style timetable, then a variation of Munich's, and maybe make a Copenhagen style timetable for the whole route
 - Test frequency algorithm on a variety of MPK Lublin lines and stops (including these in non-holiday timetables)
 - A website that will display a specific timetable picked by an user, in an html format with an option to export to pdf in a print-friendly format

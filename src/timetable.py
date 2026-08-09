@@ -32,7 +32,7 @@ def make_a_span_list(url):
 
     return span_list
 
-def make_a_dict_list_container(url):
+def make_a_dict_list(url):
     soup = make_a_request(url)
 
     # Parsing table header row
@@ -103,54 +103,54 @@ def make_a_dict_list_container(url):
 
     # Making dictionaries with hours as keys and list of minutes as values (ex. '5': ['00', '32', '59'])
 
-    table_dict_list_container = []
+    table_dict_list = []
     for i in range(len(table_hour_list_container)):
-        table_dict_list = dict(zip(table_hour_list_container[i], table_minute_list_td_clean[i]))
-        table_dict_list_container.append(table_dict_list)
+        table_dict = dict(zip(table_hour_list_container[i], table_minute_list_td_clean[i]))
+        table_dict_list.append(table_dict)
 
-    return table_dict_list_container
+    return table_dict_list
 
+def tuples_match_except_keys(d1, d2):
+    key1, value1 = d1
+    key2, value2 = d2
+    return value1 == value2
 
 def make_a_dict_list_short(url):
-    dict_list_container = make_a_dict_list_container(url)
+    dict_container = make_a_dict_list(url)
+    dict_container_short = []
 
-    dict_list_container_short = []
+    for current_dict_list in dict_container:
+        current_tuple_list = list(current_dict_list.items())
 
-    for idx in range(len(dict_list_container)):
-        current_dict_list = dict_list_container[idx]
+        new_tuple_list = []
+        i = 0
+        n = len(current_tuple_list)
 
-    #     cols = list(current_df.columns)
-    #
-    #     new_df_data = {}
-    #
-    #     i = 0
-    #     while i < len(cols):
-    #         start_col = cols[i]
-    #         end_col = start_col
-    #
-    #         j = i + 1
-    #         while j < len(cols):
-    #             if current_df[start_col].equals(current_df[cols[j]]):
-    #                 end_col = cols[j]
-    #                 j += 1
-    #             else:
-    #                 break
-    #
-    #         if start_col != end_col:
-    #             new_name = f"{start_col}-{end_col}"
-    #         else:
-    #             new_name = str(start_col)
-    #
-    #         new_df_data[new_name] = current_df[start_col]
-    #         i = j
-    #
-    #     df_list_short.append(pd.DataFrame(new_df_data))
-    #
-    # return df_list_short
+        while i < n:
+            start_tuple = current_tuple_list[i]
+            j = i + 1
+
+            while j < n and tuples_match_except_keys(start_tuple, current_tuple_list[j]):
+                j += 1
+
+            end_tuple = current_tuple_list[j - 1]
+            new_tuple = start_tuple
+
+            if j - i > 1:
+                start_key, start_val = start_tuple
+                end_key, end_val = end_tuple
+                new_tuple = (f"{start_key}-{end_key}", start_val)
+
+            new_tuple_list.append(new_tuple)
+            i = j
+
+        dict_container_short.append(new_tuple_list)
+
+    return dict_container_short
 
 
 def make_a_df_list(url):
-    table_dict_list = make_a_dict_list_container(url)
+    table_dict_list = make_a_dict_list(url)
 
     # Adding Nan's to hours that don't have any departures
 
@@ -265,7 +265,7 @@ def export_to_template(url, output_path="../web/test.html"):
         template = Template(f.read(), trim_blocks=True, lstrip_blocks=True)
 
     html_out = template.render(
-        table_dict_list = make_a_dict_list_container(url),
+        table_dict_list = make_a_dict_list(url),
         span_list = make_a_span_list(url),
         timetable_valid_from = parse_timetable_valid_from(url, iso_format=False),
         street_names = parse_street_names(url),
@@ -281,4 +281,4 @@ def export_to_template(url, output_path="../web/test.html"):
 
 url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 
-export_to_template(url)
+print(make_a_dict_list_short(url))
