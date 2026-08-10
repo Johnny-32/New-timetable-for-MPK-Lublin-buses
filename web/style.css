@@ -1,29 +1,19 @@
-* {
-    font-family: Inter, sans-serif;
+@page {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
-:root {
+@media print {
+    font-size: 11pt;
+}
+
+body {
+    font-family: Inter, sans-serif;
+    box-sizing: border-box;
     --bg-primary: white;
     --bg-element: lightgray;
     --highlight-color: navy;
-}
-
-table.Vienna-style-timetable {
-    text-align: right;
-    border: none;
-    border-collapse: collapse;
-
-    th, td {
-        border: none;
-        padding: 0.1rem 0.25rem;
-    }
-
-    tr:nth-child(odd) {
-        background-color: var(--bg-element);
-    }
+    padding: 0.5cm 0.5cm 0;
 }
 
 #route-info {
@@ -40,8 +30,33 @@ table.Vienna-style-timetable {
     flex-direction: column;
 }
 
+main {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
 .timetable-period {
     font-weight: bold;
+}
+
+/* TODO add specific column widths like 1cm*/
+
+table.Vienna-style-timetable {
+    table-layout: fixed;
+    text-align: right;
+    border: none;
+    border-collapse: collapse;
+}
+
+table.Vienna-style-timetable th,
+table.Vienna-style-timetable td {
+    border: none;
+    padding: 0.1rem 0.25rem;
+}
+
+table.Vienna-style-timetable tr:nth-child(odd) {
+    background-color: var(--bg-element);
 }
 
 footer {

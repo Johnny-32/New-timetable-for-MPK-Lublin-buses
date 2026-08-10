@@ -1,5 +1,5 @@
 from functools import lru_cache
-
+from weasyprint import HTML
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -206,4 +206,5 @@ def export_to_template(url, output_path="../web/test.html"):
 
 url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 
-export_to_template(url)
+html_out = export_to_template(url)
+HTML("../web/test.html").write_pdf("../web/test.pdf")

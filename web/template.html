@@ -19,8 +19,8 @@
 </header>
 <main>
     {% for table_dict in table_dict_list %}
-    <span class="timetable-period">{{ span_list[loop.index0] }}</span>
     <table class="Vienna-style-timetable">
+        <caption class="timetable-period">{{ span_list[loop.index0] }}</caption>
         {% for hour, minutes in table_dict.items() %}
         <tr>
             <td>{{ hour }}</td>
