@@ -210,15 +210,15 @@ def export_to_template(
     )
 
 
-def html_to_pdf(url, html_path="../web/test.html", pdf_path="../web/test.pdf"):
+def html_to_pdf(html_path="../web/test.html", pdf_path="../web/test.pdf"):
     with sync_playwright() as p:
         browser = p.chromium.launch()
         page = browser.new_page()
         page.goto(f"file://{os.path.abspath(html_path)}")
-        page.pdf(path=pdf_path, print_background=True)
+        page.pdf(path=pdf_path, landscape=True, print_background=True)
         browser.close()
 
 url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 
 export_to_template(url)
-html_to_pdf(url)
+html_to_pdf()

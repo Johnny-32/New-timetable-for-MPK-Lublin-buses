@@ -1,3 +1,5 @@
+/*Add margin-bottom to everything*/
+
 body {
     font-family: Inter, sans-serif;
     box-sizing: border-box;
@@ -14,6 +16,21 @@ body {
     color: var(--bg-primary);
     width: fit-content;
     gap: 0.5rem;
+    padding: 0.2rem;
+    font-size: 2rem;
+    font-weight: bolder;
+    margin-bottom: 0.5rem;
+}
+
+#stop_name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+#street_names {
+    margin-bottom: 0.5rem;
+    text-align: justify;
 }
 
 #location-info {
@@ -29,32 +46,63 @@ main {
 
 .timetable-period {
     font-weight: bold;
+    border-bottom: 0.2rem solid #000;
+    padding-bottom: 0.2rem;
 }
 
 table.Vienna-style-timetable {
     text-align: right;
     border: none;
     border-collapse: collapse;
-    flex: 0 0 auto;
     width: auto;
-}
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+    margin-right: 1rem;
 
-table.Vienna-style-timetable caption.timetable-period {
-    text-align: left;
-}
+    caption.timetable-period {
+        text-align: left;
+    }
+    
+    tbody {
+        margin-top: 0.2rem;
+    }
 
-table.Vienna-style-timetable th,
-table.Vienna-style-timetable td {
-    border: none;
-    padding: 0.1rem 0.25rem;
-}
+    th, td {
+        border: none;
+        padding: 0.1rem 0.25rem;
+    }
+    
+    th {
+        font-weight: bold;
+    }
 
-table.Vienna-style-timetable tr:nth-child(odd) {
-    background-color: var(--bg-element);
+    tr:nth-child(odd) {
+            background-color: var(--bg-element);
+    }
+
 }
 
 footer {
-    display: flex;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
     background-color: var(--bg-element);
+    height: 5rem;
+    
+    #left-part {
+        justify-self: left;
+        margin-left: 0.5rem;
+    }
+    #center-part {
+        justify-self: center;
+    }
+    #right-part {
+        justify-self: end;
+        margin-right: 0.5rem;
+    }
+}
+
+.bold-number {
+    font-weight: bold;
 }
