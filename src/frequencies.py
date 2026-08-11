@@ -1,8 +1,37 @@
-from src.timetable import make_a_df_list, make_a_span_list, url
+from src.timetable import make_a_dict_list, make_a_span_list, url
+import pandas as pd
 from math import isnan
 
+def make_a_df_list(url):
+    table_dict_list = make_a_dict_list(url)
+
+    # Adding Nan's to hours that don't have any departures
+
+    for table_dict in table_dict_list:
+        for key, elem in table_dict.items():
+            if len(elem) == 1 and '' in elem:
+                table_dict[key] = [float('nan')]
+
+
+    # Adding Nan's so that I can make a proper df, because all lists must be of the same length
+
+    for table_dict in table_dict_list:
+        m = len(max(table_dict.values(), key=len))
+        for elem in table_dict.values():
+            while len(elem) < m:
+                elem.append(float("nan"))
+
+    # Creating df's with header row and deleting indexes
+
+    df_list = []
+    for i, table_dict in enumerate(table_dict_list):
+        df_list.append(pd.DataFrame(table_dict_list[i]))
+        df_list[i].index = [''] * len(df_list[i])
+
+    return df_list
+
+
 minute_list_container = []
-difference_list_container = []
 difference_list_container = []
 group_list_for_a_timetable_period_container = []
 not_matched_index_list_container = []
@@ -187,7 +216,7 @@ for idx in range(len(df_list)):
                                     break
                             # Very unlikely that this will ever execute
                             # If we reach the end elements and differences are still the same
-                            # We move the non matched element to the group to the left
+                            # We move the non-matched element to the group to the left
                             else:
                                 left_group.append(item)
                                 current_group_list.pop(idx_gr)

@@ -1,6 +1,6 @@
+import os.path
 from functools import lru_cache
-from weasyprint import HTML
-import pandas as pd
+from playwright.sync_api import sync_playwright
 import requests
 from bs4 import BeautifulSoup
 from jinja2 import Template
@@ -184,12 +184,22 @@ def parse_stop_id(url):
 
     return soup.select_one("div.rozklad-przystanek > b > a").text.split("-")[0].strip()
 
-def export_to_template(url, output_path="../web/test.html"):
-    with open("../web/template.html", encoding="utf-8") as f:
+def render_to_file(template_path, output_path, **context):
+    with open(template_path, encoding="utf-8") as f:
         template = Template(f.read(), trim_blocks=True, lstrip_blocks=True)
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(template.render(**context))
 
-    html_out = template.render(
-        table_dict_list = make_a_dict_list(url),
+def export_to_template(
+        url,
+        html_template="../web/template.html",
+        html_out="../web/test.html",
+):
+    table_dict_list = make_a_dict_list(url)
+
+    render_to_file(
+        html_template, html_out,
+        table_dict_list=table_dict_list,
         span_list = make_a_span_list(url),
         timetable_valid_from = parse_timetable_valid_from(url, iso_format=False),
         street_names = parse_street_names(url),
@@ -199,12 +209,16 @@ def export_to_template(url, output_path="../web/test.html"):
         stop_id = parse_stop_id(url)
     )
 
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(html_out)
 
-    return html_out
+def html_to_pdf(url, html_path="../web/test.html", pdf_path="../web/test.pdf"):
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page()
+        page.goto(f"file://{os.path.abspath(html_path)}")
+        page.pdf(path=pdf_path, print_background=True)
+        browser.close()
 
 url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 
-html_out = export_to_template(url)
-HTML("../web/test.html").write_pdf("../web/test.pdf")
+export_to_template(url)
+html_to_pdf(url)
