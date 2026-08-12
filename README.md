@@ -16,7 +16,6 @@ This project aims to make a better looking and simpler timetable for MPK Lublin 
 ## To do:
 - Make a proper logo with a barcode with my GitHub project url
 - Make a stop list like in a Viennese timetable
-- Make a 
 
 ## Currently working on:
 Making a Vienna style timetable
