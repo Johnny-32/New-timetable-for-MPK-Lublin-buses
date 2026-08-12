@@ -5,21 +5,30 @@ import requests
 from bs4 import BeautifulSoup
 from jinja2 import Template
 
-@lru_cache(maxsize=32)
+# Temporary fix to not over work mpklublin.pl servers, only for testing
+
 def make_a_request(url):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
+    path = "../32_test.html"
+    with open(path, encoding="utf-8") as f:
+        html = f.read()
 
-    try:
-        response = requests.get(url, headers=headers, timeout=10)
-        response.encoding = "utf-8"
-        response.raise_for_status()
-    except requests.RequestException as e:
-        print(f"Website parsing error: {e}")
-        return None
+    return BeautifulSoup(html, "html.parser")
 
-    return BeautifulSoup(response.text, "html.parser")
+# @lru_cache(maxsize=32)
+# def make_a_request(url):
+#     headers = {
+#         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+#     }
+#
+#     try:
+#         response = requests.get(url, headers=headers, timeout=10)
+#         response.encoding = "utf-8"
+#         response.raise_for_status()
+#     except requests.RequestException as e:
+#         print(f"Website parsing error: {e}")
+#         return None
+#
+#     return BeautifulSoup(response.text, "html.parser")
 
 
 def make_a_span_list(url):

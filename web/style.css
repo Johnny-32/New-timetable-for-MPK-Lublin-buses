@@ -1,12 +1,25 @@
-/*Add margin-bottom to everything*/
+html {
+    height: 100%;
+}
 
 body {
+    display: flex;
+    flex-direction: column;
     font-family: Inter, sans-serif;
     box-sizing: border-box;
     --bg-primary: white;
     --bg-element: lightgray;
     --highlight-color: navy;
+    margin: 0;
+    min-height: 100%;
+}
+
+body > :not(main, footer) {
     margin: 0.5cm 0.5cm 0;
+}
+
+body > :not(header, footer) {
+    margin: 0 0.5cm
 }
 
 #route-info {
@@ -17,7 +30,7 @@ body {
     width: fit-content;
     gap: 0.5rem;
     padding: 0.2rem;
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: bolder;
     margin-bottom: 0.5rem;
 }
@@ -41,31 +54,29 @@ body {
 main {
     display: grid;
     grid-template-columns: repeat(var(--table-count), 1fr);
-    width: 100%;
+}
+
+.timetable-container {
+    margin-right: 1.5rem;
 }
 
 .timetable-period {
-    font-weight: bold;
+    font-size: 1.25rem;
     border-bottom: 0.2rem solid #000;
     padding-bottom: 0.2rem;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
 }
 
 table.Vienna-style-timetable {
+    justify-self: start;
     text-align: right;
     border: none;
     border-collapse: collapse;
     width: auto;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 1rem;
-    margin-right: 1rem;
 
     caption.timetable-period {
         text-align: left;
-    }
-    
-    tbody {
-        margin-top: 0.2rem;
     }
 
     th, td {
@@ -89,17 +100,18 @@ footer {
     align-items: center;
     background-color: var(--bg-element);
     height: 5rem;
+    margin-top: auto;
     
     #left-part {
         justify-self: left;
-        margin-left: 0.5rem;
+        margin-left: 0.5cm;
     }
     #center-part {
         justify-self: center;
     }
     #right-part {
         justify-self: end;
-        margin-right: 0.5rem;
+        margin-right: 0.5cm;
     }
 }
 
