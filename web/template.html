@@ -22,12 +22,14 @@
     <main>
         <div id="stop-and-street-list">
             {% for street, stop_list in stops_and_streets.items() %}
+            <h3 class="street-name">{{ street }}</h3>
             <ul class="street-container">
-                {{ street }}
                 {% for stop in stop_list %}
-                <li class="stop-name-in-a-list">
-                    {{ stop }}
-                </li>
+                {% if stop == stop_name %}
+                <li id="current-stop">{{ stop }}</li>
+                {% else %}
+                <li>{{ stop }}</li>
+                {% endif %}
                 {% endfor %}
             </ul>
             {% endfor %}

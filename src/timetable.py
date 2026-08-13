@@ -7,28 +7,31 @@ from jinja2 import Template
 
 # Temporary fix to not over work mpklublin.pl servers, only for testing
 
-def make_a_request(url):
-    path = "../32_test.html"
-    with open(path, encoding="utf-8") as f:
-        html = f.read()
-
-    return BeautifulSoup(html, "html.parser")
-
-# @lru_cache(maxsize=32)
 # def make_a_request(url):
-#     headers = {
-#         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-#     }
+#     path = "../32_test.html"
+#     with open(path, encoding="utf-8") as f:
+#         html = f.read()
 #
-#     try:
-#         response = requests.get(url, headers=headers, timeout=10)
-#         response.encoding = "utf-8"
-#         response.raise_for_status()
-#     except requests.RequestException as e:
-#         print(f"Website parsing error: {e}")
-#         return None
-#
-#     return BeautifulSoup(response.text, "html.parser")
+#     return BeautifulSoup(html, "html.parser")
+
+@lru_cache(maxsize=32)
+def make_a_request(url, html5lib_parser = False):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.encoding = "utf-8"
+        response.raise_for_status()
+    except requests.RequestException as e:
+        print(f"Website parsing error: {e}")
+        return None
+
+    if not html5lib_parser:
+        return BeautifulSoup(response.text, "html.parser")
+
+    return BeautifulSoup(response.text, "html5lib")
 
 
 def make_a_span_list(url):
@@ -45,8 +48,6 @@ def make_a_dict_list(url):
     soup = make_a_request(url)
 
     # Parsing table header row
-
-    table_list = soup.find_all('table')
 
     table_hour_list_th_temp = soup.find_all('th')
     table_hour_list_th_temp2 = [table_hour.get_text() for table_hour in table_hour_list_th_temp]
@@ -89,14 +90,31 @@ def make_a_dict_list(url):
     min_counter = 0
 
     for table_minute_one_hour_list in table_minute_list_td:
-        if table_minute_one_hour_list.isnumeric():
-            number_of_groups = len(table_minute_one_hour_list) // 2
-            for i in range(number_of_groups):
-                first_position = 2 * i
-                table_minute_list_one_hour_td_clean.append(
-                    table_minute_one_hour_list[first_position:first_position + 2])
+        if not "Min." in table_minute_one_hour_list:
+
+            # Group is for ex. 00 or 32a
+            group = ""
+
+            for idx in range(len(table_minute_one_hour_list)):
+                next_idx = idx + 1
+                if table_minute_one_hour_list[idx].isnumeric():
+                    group += table_minute_one_hour_list[idx]
+                    if (len(group) == 2 and (next_idx < len(table_minute_one_hour_list))
+                            and table_minute_one_hour_list[next_idx].isnumeric()):
+                        table_minute_list_one_hour_td_clean.append(group)
+                        group = ""
+
+                if not table_minute_one_hour_list[idx].isnumeric():
+                    group += table_minute_one_hour_list[idx]
+                    table_minute_list_one_hour_td_clean.append(group)
+                    group = ""
+
+            if group:
+                table_minute_list_one_hour_td_clean.append(group)
+
             table_minute_list_one_schedule_td_clean.append(table_minute_list_one_hour_td_clean)
             table_minute_list_one_hour_td_clean = []
+
         else:
             if table_minute_one_hour_list:
                 min_counter += 1
@@ -160,7 +178,7 @@ def make_a_dict_list_short(url):
 def parse_timetable_valid_from(url, iso_format = True):
     soup = make_a_request(url)
 
-    temp = soup.select_one('div[align="right"]').text.split()[-1]
+    temp = soup.select_one('div[align="right"]').get_text(strip=True).split()[-1]
 
     if iso_format:
         return temp
@@ -172,7 +190,7 @@ def parse_timetable_valid_from(url, iso_format = True):
 def parse_street_names(url):
     soup = make_a_request(url)
 
-    return soup.select_one("center > strong").text
+    return soup.select_one("center > strong").get_text(strip=True)
 
 def parse_line(url):
     part_url = url.split("?")[1]
@@ -186,12 +204,12 @@ def parse_destination(url):
 def parse_stop_name(url):
     soup = make_a_request(url)
 
-    return soup.select_one("div.rozklad-przystanek > b > a").text.split("-")[1].strip()
+    return soup.select_one("div.rozklad-przystanek > b > a").get_text(strip=True).split("-")[1].strip()
 
 def parse_stop_id(url):
     soup = make_a_request(url)
 
-    return soup.select_one("div.rozklad-przystanek > b > a").text.split("-")[0].strip()
+    return soup.select_one("div.rozklad-przystanek > b > a").get_text(strip=True).split("-")[0].strip()
 
 def parse_stops(url):
     soup = make_a_request(url)
@@ -207,9 +225,11 @@ def parse_stops(url):
 # ex. {"street1": ["stop1", "stop2"], ...}
 
 def parse_stops_and_streets(url, strip_stop_id=True):
-    soup = make_a_request(url)
+    soup = make_a_request(url, html5lib_parser=True)
 
     li_list = [li for li in soup.select("ul.rozklad-mapa > li")]
+
+    # print(li_list)
 
     street_name_sublist = []
     stop_and_street_dict = {}
@@ -225,14 +245,13 @@ def parse_stops_and_streets(url, strip_stop_id=True):
         else:
             stop_name = li.find("a").get_text(strip=True)
             if strip_stop_id:
-                stop_name = stop_name.split("-", 1)[1]
+                stop_name = stop_name.split("-", 1)[1].strip()
             street_name_sublist.append(stop_name)
 
     return stop_and_street_dict
 
 def parse_period(url):
     span_list = make_a_span_list(url)
-    period = None
 
     for span in span_list:
         if "DZIEŃ POWSZEDNI" in span:
@@ -253,6 +272,28 @@ def make_a_better_span_list(url):
             new_span_list.append(span)
 
     return new_span_list
+
+# For ex. we have a dict and we're focusing on departures for one hour {'5': ['00', '32a', '59'], ...},
+# we should get {'5': ['', 'a', ''], ...}
+
+def map_special_departures(url):
+    dict_list = make_a_dict_list(url)
+
+    list_for_dicts_with_special_departures = []
+
+    for dict_for_period in dict_list:
+
+        dict_with_special_departures = {
+            hour: ["".join(filter(str.isalpha, minute))for minute in minute_list]
+            for hour, minute_list in dict_for_period.items()
+        }
+
+        list_for_dicts_with_special_departures.append(dict_with_special_departures)
+
+        print(dict_with_special_departures)
+
+    return dict_with_special_departures
+
 
 def render_to_file(template_path, output_path, **context):
     with open(template_path, encoding="utf-8") as f:
@@ -289,7 +330,11 @@ def html_to_pdf(html_path="../web/test.html", pdf_path="../web/test.pdf"):
         page.pdf(path=pdf_path, landscape=True, print_background=True)
         browser.close()
 
-url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 
-export_to_template(url)
-html_to_pdf()
+# url = "https://mpk.lublin.pl/?przy=1022&lin=032"
+url = "https://mpk.lublin.pl/?przy=5112&lin=014"
+
+# export_to_template(url)
+# html_to_pdf()
+
+map_special_departures(url)
