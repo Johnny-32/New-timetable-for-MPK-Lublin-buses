@@ -20,6 +20,18 @@
         </div>
     </header>
     <main>
+        <div id="stop-and-street-list">
+            {% for street, stop_list in stops_and_streets.items() %}
+            <ul class="street-container">
+                {{ street }}
+                {% for stop in stop_list %}
+                <li class="stop-name-in-a-list">
+                    {{ stop }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% endfor %}
+        </div>
         {% for table_dict in table_dict_list %}
         <div class="timetable-container">
             <h3 class="timetable-period">{{ span_list[loop.index0] }}</h3>
@@ -41,6 +53,10 @@
             <div class="footer-2-part-text-element">
                 <span>Timetable valid from:</span>
                 <span class="bold-number">{{ timetable_valid_from }}</span>
+            </div>
+            <div class="footer-2-part-text-element">
+                <span>Period:</span>
+                <span class="bold-number">{{ period }}</span>
             </div>
         </div>
         <div id="center-part">

@@ -35,12 +35,6 @@ body > :not(header, footer) {
     margin-bottom: 0.5rem;
 }
 
-#stop_name {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
 #street_names {
     margin-bottom: 0.5rem;
     text-align: justify;
@@ -53,7 +47,11 @@ body > :not(header, footer) {
 
 main {
     display: grid;
-    grid-template-columns: repeat(var(--table-count), 1fr);
+    grid-template-columns: repeat(calc(var(--table-count) + 1), 1fr);
+}
+
+#stop-and-street-list {
+    font-size: 0.75rem;
 }
 
 .timetable-container {
@@ -112,6 +110,12 @@ footer {
     #right-part {
         justify-self: end;
         margin-right: 0.5cm;
+    }
+    
+    #left-part, #right-part {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
     }
 }
 

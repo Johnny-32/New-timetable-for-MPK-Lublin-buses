@@ -225,10 +225,34 @@ def parse_stops_and_streets(url, strip_stop_id=True):
         else:
             stop_name = li.find("a").get_text(strip=True)
             if strip_stop_id:
-                stop_name = stop_name.split("-")[-1].strip()
+                stop_name = stop_name.split("-", 1)[1]
             street_name_sublist.append(stop_name)
 
     return stop_and_street_dict
+
+def parse_period(url):
+    span_list = make_a_span_list(url)
+    period = None
+
+    for span in span_list:
+        if "DZIEŃ POWSZEDNI" in span:
+            return span.split(",")[1]
+
+    return None
+
+def make_a_better_span_list(url):
+    period = parse_period(url)
+    span_list = make_a_span_list(url)
+    new_span_list = []
+
+    for span in span_list:
+        if period in span:
+            new_span = span.split(",")[0]
+            new_span_list.append(new_span)
+        else:
+            new_span_list.append(span)
+
+    return new_span_list
 
 def render_to_file(template_path, output_path, **context):
     with open(template_path, encoding="utf-8") as f:
@@ -246,13 +270,14 @@ def export_to_template(
     render_to_file(
         html_template, html_out,
         table_dict_list=table_dict_list,
-        span_list = make_a_span_list(url),
+        span_list = make_a_better_span_list(url),
         timetable_valid_from = parse_timetable_valid_from(url, iso_format=False),
         stops_and_streets = parse_stops_and_streets(url),
         line = parse_line(url),
         destination = parse_destination(url),
         stop_name = parse_stop_name(url),
-        stop_id = parse_stop_id(url)
+        stop_id = parse_stop_id(url),
+        period = parse_period(url)
     )
 
 
@@ -266,5 +291,5 @@ def html_to_pdf(html_path="../web/test.html", pdf_path="../web/test.pdf"):
 
 url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 
-# export_to_template(url)
-# html_to_pdf()
+export_to_template(url)
+html_to_pdf()
