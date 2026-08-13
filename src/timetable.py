@@ -193,6 +193,43 @@ def parse_stop_id(url):
 
     return soup.select_one("div.rozklad-przystanek > b > a").text.split("-")[0].strip()
 
+def parse_stops(url):
+    soup = make_a_request(url)
+
+    stop_list = [
+        a.get_text(strip=True)
+        for a in soup.select("ul.rozklad-mapa > li:not(.ulica) > a")
+    ]
+
+    return stop_list
+
+# Returns a dict with street names as keys and stop lists values
+# ex. {"street1": ["stop1", "stop2"], ...}
+
+def parse_stops_and_streets(url, strip_stop_id=True):
+    soup = make_a_request(url)
+
+    li_list = [li for li in soup.select("ul.rozklad-mapa > li")]
+
+    street_name_sublist = []
+    stop_and_street_dict = {}
+    current_street = None
+
+    for li in li_list:
+        if "ulica" in li.get("class", []):
+            if street_name_sublist:
+                stop_and_street_dict[current_street] = street_name_sublist
+                street_name_sublist = []
+
+            current_street = li.get_text(strip=True)
+        else:
+            stop_name = li.find("a").get_text(strip=True)
+            if strip_stop_id:
+                stop_name = stop_name.split("-")[-1].strip()
+            street_name_sublist.append(stop_name)
+
+    return stop_and_street_dict
+
 def render_to_file(template_path, output_path, **context):
     with open(template_path, encoding="utf-8") as f:
         template = Template(f.read(), trim_blocks=True, lstrip_blocks=True)
@@ -211,7 +248,7 @@ def export_to_template(
         table_dict_list=table_dict_list,
         span_list = make_a_span_list(url),
         timetable_valid_from = parse_timetable_valid_from(url, iso_format=False),
-        street_names = parse_street_names(url),
+        stops_and_streets = parse_stops_and_streets(url),
         line = parse_line(url),
         destination = parse_destination(url),
         stop_name = parse_stop_name(url),
@@ -229,5 +266,5 @@ def html_to_pdf(html_path="../web/test.html", pdf_path="../web/test.pdf"):
 
 url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 
-export_to_template(url)
-html_to_pdf()
+# export_to_template(url)
+# html_to_pdf()
