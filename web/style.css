@@ -108,10 +108,11 @@ main {
 
 table.Vienna-style-timetable {
     justify-self: start;
-    text-align: right;
+    text-align: left;
     border: none;
     border-collapse: collapse;
     width: auto;
+    table-layout: fixed;
 
     caption.timetable-period {
         text-align: left;
@@ -119,11 +120,20 @@ table.Vienna-style-timetable {
 
     th, td {
         border: none;
-        padding: 0.1rem 0.25rem;
+        padding-block: 0.1rem;
+        font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;    box-sizing: border-box;
     }
     
     th {
+        text-align: right;
         font-weight: bold;
+        width: 2.2ch;
+        padding-inline: 0.4rem;
+    }
+    
+    td {
+        width: 3.2ch;
+        padding-inline: 0.2rem;
     }
 
     tr:nth-child(odd) {

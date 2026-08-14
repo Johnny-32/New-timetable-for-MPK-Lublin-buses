@@ -276,23 +276,21 @@ def make_a_better_span_list(url):
 # For ex. we have a dict and we're focusing on departures for one hour {'5': ['00', '32a', '59'], ...},
 # we should get {'5': ['', 'a', ''], ...}
 
-def map_special_departures(url):
-    dict_list = make_a_dict_list(url)
-
-    list_for_dicts_with_special_departures = []
-
-    for dict_for_period in dict_list:
-
-        dict_with_special_departures = {
-            hour: ["".join(filter(str.isalpha, minute))for minute in minute_list]
-            for hour, minute_list in dict_for_period.items()
-        }
-
-        list_for_dicts_with_special_departures.append(dict_with_special_departures)
-
-        print(dict_with_special_departures)
-
-    return dict_with_special_departures
+# def map_special_departures(url):
+#     dict_list = make_a_dict_list(url)
+#
+#     list_for_dicts_with_special_departures = []
+#
+#     for dict_for_period in dict_list:
+#
+#         dict_with_special_departures = {
+#             hour: ["".join(filter(str.isalpha, minute))for minute in minute_list]
+#             for hour, minute_list in dict_for_period.items()
+#         }
+#
+#         list_for_dicts_with_special_departures.append(dict_with_special_departures)
+#
+#     return list_for_dicts_with_special_departures
 
 
 def render_to_file(template_path, output_path, **context):
@@ -306,11 +304,9 @@ def export_to_template(
         html_template="../web/template.html",
         html_out="../web/test.html",
 ):
-    table_dict_list = make_a_dict_list(url)
-
     render_to_file(
         html_template, html_out,
-        table_dict_list=table_dict_list,
+        table_dict_list = make_a_dict_list(url),
         span_list = make_a_better_span_list(url),
         timetable_valid_from = parse_timetable_valid_from(url, iso_format=False),
         stops_and_streets = parse_stops_and_streets(url),
@@ -336,5 +332,3 @@ url = "https://mpk.lublin.pl/?przy=5112&lin=014"
 
 # export_to_template(url)
 # html_to_pdf()
-
-map_special_departures(url)

@@ -14,8 +14,8 @@ This project aims to make a better looking and simpler timetable for MPK Lublin 
 - Calculating frequencies on the specific line, the stop and time of day, using my own algorithm
 
 ## To do:
-- Add map_special_departures() to the Python script and integrate it to the template
-- Add coloring or a way to differentiate special departures from each other
+- Add descriptions of special departures on the bottom of the timetables
+- Make stop list span the entire height of a document
 - Make a proper logo with a barcode with my GitHub project url
 
 ## Currently working on:
