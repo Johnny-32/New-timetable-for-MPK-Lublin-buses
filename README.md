@@ -14,8 +14,7 @@ This project aims to make a better looking and simpler timetable for MPK Lublin 
 - Calculating frequencies on the specific line, the stop and time of day, using my own algorithm
 
 ## To do:
-- Add descriptions of special departures on the bottom of the timetables
-- Make stop list span the entire height of a document
+- Make stop list gray if the stops have been in the past, keep them the same if they will be in the future
 - Make a proper logo with a barcode with my GitHub project url
 
 ## Currently working on:
