@@ -199,7 +199,7 @@ def parse_line(url):
 def parse_destination(url):
     soup = make_a_request(url)
 
-    return soup.find("div", class_="rozklad-kierunek").text.split()[1]
+    return soup.find("div", class_="rozklad-kierunek").text.replace("Kierunek:", "").strip()
 
 def parse_stop_name(url):
     soup = make_a_request(url)
@@ -229,8 +229,6 @@ def parse_stops_and_streets(url, strip_stop_id=True):
 
     li_list = [li for li in soup.select("ul.rozklad-mapa > li")]
 
-    # print(li_list)
-
     street_name_sublist = []
     stop_and_street_dict = {}
     current_street = None
@@ -247,6 +245,9 @@ def parse_stops_and_streets(url, strip_stop_id=True):
             if strip_stop_id:
                 stop_name = stop_name.split("-", 1)[1].strip()
             street_name_sublist.append(stop_name)
+
+    if current_street and street_name_sublist:
+        stop_and_street_dict[current_street] = street_name_sublist
 
     return stop_and_street_dict
 
@@ -272,6 +273,22 @@ def make_a_better_span_list(url):
             new_span_list.append(span)
 
     return new_span_list
+
+def parse_special_departures_texts(url):
+    soup = make_a_request(url)
+    div = soup.select_one("div#middle-area")
+
+    direct_texts = div.find_all(string=True, recursive=False)
+    direct_texts = [s.strip() for s in direct_texts]
+
+    list_of_special_departure_texts = []
+
+    for text in direct_texts:
+        if text and text[0].isalpha():
+            list_of_special_departure_texts.append(text)
+
+    return list_of_special_departure_texts
+
 
 # For ex. we have a dict and we're focusing on departures for one hour {'5': ['00', '32a', '59'], ...},
 # we should get {'5': ['', 'a', ''], ...}
@@ -307,6 +324,7 @@ def export_to_template(
     render_to_file(
         html_template, html_out,
         table_dict_list = make_a_dict_list(url),
+        special_departures = parse_special_departures_texts(url),
         span_list = make_a_better_span_list(url),
         timetable_valid_from = parse_timetable_valid_from(url, iso_format=False),
         stops_and_streets = parse_stops_and_streets(url),
@@ -327,8 +345,8 @@ def html_to_pdf(html_path="../web/test.html", pdf_path="../web/test.pdf"):
         browser.close()
 
 
-# url = "https://mpk.lublin.pl/?przy=1022&lin=032"
-url = "https://mpk.lublin.pl/?przy=5112&lin=014"
+url = "https://mpk.lublin.pl/?przy=1022&lin=032"
+# url = "https://mpk.lublin.pl/?przy=2122&lin=039"
 
-# export_to_template(url)
-# html_to_pdf()
+export_to_template(url)
+html_to_pdf()

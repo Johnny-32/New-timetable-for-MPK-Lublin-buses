@@ -3,59 +3,56 @@ html {
 }
 
 body {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns:
+        calc(100% / (var(--table-count) + 1))
+        calc(100% * var(--table-count) / (var(--table-count) + 1));
     font-family: Inter, sans-serif;
     box-sizing: border-box;
     --bg-primary: white;
     --bg-element: lightgray;
     --highlight-color: #0f285c;
+    padding: 0.5cm 0 0 0.5cm;
     margin: 0;
     min-height: 100%;
 }
 
-body > :not(main, footer) {
-    margin: 0.5cm 0.5cm 0;
-}
-
-body > :not(header, footer) {
-    margin: 0 0.5cm
-}
-
-header {
-    display: flex;
-    justify-content: space-between;
-}
-
-#route-info {
-    display: flex;
-    justify-content: flex-start;
-    background-color: var(--highlight-color);
-    color: var(--bg-primary);
-    width: fit-content;
-    gap: 0.5rem;
-    padding: 0.2rem;
-    font-size: 2.5rem;
-    font-weight: bolder;
-    margin-bottom: 0.5rem;
-}
-
-#stop_name {
-    font-weight: bold;
-    font-size: 2rem;
-    width: fit-content;
-    border-bottom: var(--highlight-color) 0.5rem solid;
-}
-
-#location-info {
+#right-column {
     display: flex;
     flex-direction: column;
 }
 
+header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: fit-content;
+    margin: 0 auto 1rem auto;
+    background-color: var(--highlight-color);
+    color: var(--bg-primary);
+    padding: 0.2rem 0.5rem;
+    font-size: 2.5rem;
+    font-weight: bolder;
+    
+    #line-number {
+        font-size: 3rem;
+    }
+}
+
 main {
     display: grid;
-    grid-template-columns: repeat(calc(var(--table-count) + 1), 1fr);
+    grid-template-columns: repeat(var(--table-count), 1fr);
+    margin-bottom: 0.5rem;
 }
+
+#special-departures {
+    font-size: 0.75rem;
+    
+    p {
+        margin-block: 0.1rem;
+    }
+}
+
 
 #stop-and-street-list {
     font-size: 0.75rem;
@@ -147,7 +144,7 @@ footer {
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     background-color: var(--bg-element);
-    height: 5rem;
+    height: 4rem;
     margin-top: auto;
     
     #left-part {
