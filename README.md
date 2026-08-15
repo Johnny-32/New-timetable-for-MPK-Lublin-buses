@@ -14,8 +14,9 @@ This project aims to make a better looking and simpler timetable for MPK Lublin 
 - Calculating frequencies on the specific line, the stop and time of day, using my own algorithm
 
 ## To do:
-- Make stop list gray if the stops have been in the past, keep them the same if they will be in the future
 - Make a proper logo with a barcode with my GitHub project url
+- Make a disclaimer on the left, below the stop and street list
+- Make a second version with the stop list in the middle (between the header and the tables) with tilted text (inspired by Viennese timetables)
 
 ## Currently working on:
 Making a Vienna style timetable
