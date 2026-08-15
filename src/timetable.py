@@ -5,15 +5,6 @@ import requests
 from bs4 import BeautifulSoup
 from jinja2 import Template
 
-# Temporary fix to not over work mpklublin.pl servers, only for testing
-
-# def make_a_request(url):
-#     path = "../32_test.html"
-#     with open(path, encoding="utf-8") as f:
-#         html = f.read()
-#
-#     return BeautifulSoup(html, "html.parser")
-
 @lru_cache(maxsize=32)
 def make_a_request(url, html5lib_parser = False):
     headers = {
@@ -288,26 +279,6 @@ def parse_special_departures_texts(url):
             list_of_special_departure_texts.append(text)
 
     return list_of_special_departure_texts
-
-
-# For ex. we have a dict and we're focusing on departures for one hour {'5': ['00', '32a', '59'], ...},
-# we should get {'5': ['', 'a', ''], ...}
-
-# def map_special_departures(url):
-#     dict_list = make_a_dict_list(url)
-#
-#     list_for_dicts_with_special_departures = []
-#
-#     for dict_for_period in dict_list:
-#
-#         dict_with_special_departures = {
-#             hour: ["".join(filter(str.isalpha, minute))for minute in minute_list]
-#             for hour, minute_list in dict_for_period.items()
-#         }
-#
-#         list_for_dicts_with_special_departures.append(dict_with_special_departures)
-#
-#     return list_for_dicts_with_special_departures
 
 
 def render_to_file(template_path, output_path, **context):
