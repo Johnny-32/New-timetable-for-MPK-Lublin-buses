@@ -1,9 +1,12 @@
 import os.path
+import re
 from functools import lru_cache
 from playwright.sync_api import sync_playwright
 import requests
 from bs4 import BeautifulSoup
 from jinja2 import Template
+import tkinter as tk
+from tkinter import filedialog
 
 @lru_cache(maxsize=32)
 def make_a_request(url, html5lib_parser = False):
@@ -321,3 +324,31 @@ url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 
 export_to_template(url)
 html_to_pdf()
+
+# if __name__ == "__main__":
+#     print("Enter the url of a timetable you want to generate:")
+#     url = input()
+#
+#     # RegEx that will check if the url has a proper structure, it doesn't check whether the url exists
+#
+#     pattern = r"^(https://mpk\.lublin\.pl/\?przy=\d{4}&lin=[0-9A-Z]{3})"
+#
+#     url_proper_structure = re.search(pattern, url)
+#
+#     root = tk.Tk()
+#     root.withdraw()
+#
+#     save_path = filedialog.asksaveasfilename(
+#         defaultextension=".pdf",
+#         filetypes=[("PDF files", "*.pdf")],
+#         initialfile="placeholder.pdf",
+#         title="placeholder"
+#     )
+#
+#     if save_path:
+#         if export_to_template(url):
+#             html_to_pdf()
+#         else:
+#             print("Placeholder error")
+#     else:
+#         print("Save cancelled")
