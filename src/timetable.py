@@ -295,28 +295,36 @@ def export_to_template(
         html_template="../web/template.html",
         html_out="../web/test.html",
 ):
-    render_to_file(
-        html_template, html_out,
-        table_dict_list = make_a_dict_list(url),
-        special_departures = parse_special_departures_texts(url),
-        span_list = make_a_better_span_list(url),
-        timetable_valid_from = parse_timetable_valid_from(url, iso_format=False),
-        stops_and_streets = parse_stops_and_streets(url),
-        line = parse_line(url),
-        destination = parse_destination(url),
-        stop_name = parse_stop_name(url),
-        stop_id = parse_stop_id(url),
-        period = parse_period(url)
-    )
+    try:
+        render_to_file(
+            html_template, html_out,
+            table_dict_list = make_a_dict_list(url),
+            special_departures = parse_special_departures_texts(url),
+            span_list = make_a_better_span_list(url),
+            timetable_valid_from = parse_timetable_valid_from(url, iso_format=False),
+            stops_and_streets = parse_stops_and_streets(url),
+            line = parse_line(url),
+            destination = parse_destination(url),
+            stop_name = parse_stop_name(url),
+            stop_id = parse_stop_id(url),
+            period = parse_period(url)
+        )
+    except Exception as e:
+        print(f"Failed to export to a template: {e}")
+        raise
 
 
 def html_to_pdf(html_path="../web/test.html", pdf_path="../web/test.pdf"):
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-        page = browser.new_page()
-        page.goto(f"file://{os.path.abspath(html_path)}")
-        page.pdf(path=pdf_path, landscape=True, print_background=True)
-        browser.close()
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            page.goto(f"file://{os.path.abspath(html_path)}")
+            page.pdf(path=pdf_path, landscape=True, print_background=True)
+            browser.close()
+    except Exception as e:
+        print(f"Failed to make .pdf file: {e}")
+        raise
 
 
 url = "https://mpk.lublin.pl/?przy=1022&lin=032"
@@ -325,30 +333,42 @@ url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 export_to_template(url)
 html_to_pdf()
 
-# if __name__ == "__main__":
-#     print("Enter the url of a timetable you want to generate:")
-#     url = input()
-#
-#     # RegEx that will check if the url has a proper structure, it doesn't check whether the url exists
-#
-#     pattern = r"^(https://mpk\.lublin\.pl/\?przy=\d{4}&lin=[0-9A-Z]{3})"
-#
-#     url_proper_structure = re.search(pattern, url)
-#
-#     root = tk.Tk()
-#     root.withdraw()
-#
-#     save_path = filedialog.asksaveasfilename(
-#         defaultextension=".pdf",
-#         filetypes=[("PDF files", "*.pdf")],
-#         initialfile="placeholder.pdf",
-#         title="placeholder"
-#     )
-#
-#     if save_path:
-#         if export_to_template(url):
-#             html_to_pdf()
-#         else:
-#             print("Placeholder error")
-#     else:
-#         print("Save cancelled")
+if __name__ == "__main__":
+    # RegEx that will check if the url has a proper structure, it doesn't check whether the url exists
+
+    pattern = r"^(https://mpk\.lublin\.pl/\?przy=\d{4}&lin=[0-9A-Z]{3})"
+
+    while True:
+        url = input("Enter the url of a timetable you want to generate: ").strip()
+        if re.fullmatch(pattern, url):
+            break
+        print("Enter a correct url, try again")
+
+    root = tk.Tk()
+    root.withdraw()
+    root.attributes("-topmost", True)
+    root.update()
+
+    line = parse_line(url)
+    destination = parse_destination(url)
+    stop_name = parse_stop_name(url)
+
+    save_path = filedialog.asksaveasfilename(
+        defaultextension=".pdf",
+        filetypes=[("PDF files", "*.pdf")],
+        initialfile=f"{line}_{destination}_from_{stop_name}.pdf",
+        title=f"{line} {destination} from {stop_name}",
+        parent=root
+    )
+
+    root.destroy()
+
+    if save_path:
+        if export_to_template(url):
+            html_to_pdf(pdf_path=save_path)
+
+            print(f"Timetable for {line} {destination} from {stop_name} has been successfully made")
+        else:
+            print("Placeholder error")
+    else:
+        print("Save cancelled")
