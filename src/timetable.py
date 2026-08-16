@@ -283,6 +283,13 @@ def parse_special_departures_texts(url):
 
     return list_of_special_departure_texts
 
+def make_filename(url, have_whitespace):
+    filename = f"{line} {destination} from {stop_name}.pdf"
+    if not have_whitespace:
+        filename.replace(" ", "_")
+
+    return filename
+
 
 def render_to_file(template_path, output_path, **context):
     with open(template_path, encoding="utf-8") as f:
@@ -311,7 +318,9 @@ def export_to_template(
         )
     except Exception as e:
         print(f"Failed to export to a template: {e}")
-        raise
+        return None
+
+    return True
 
 
 def html_to_pdf(html_path="../web/test.html", pdf_path="../web/test.pdf"):
@@ -324,11 +333,14 @@ def html_to_pdf(html_path="../web/test.html", pdf_path="../web/test.pdf"):
             browser.close()
     except Exception as e:
         print(f"Failed to make .pdf file: {e}")
-        raise
+        return None
+
+    return True
 
 
-url = "https://mpk.lublin.pl/?przy=1022&lin=032"
+# url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 # url = "https://mpk.lublin.pl/?przy=2122&lin=039"
+url = "https://mpk.lublin.pl/?przy=5581&lin=150"
 
 export_to_template(url)
 html_to_pdf()
@@ -356,7 +368,7 @@ if __name__ == "__main__":
     save_path = filedialog.asksaveasfilename(
         defaultextension=".pdf",
         filetypes=[("PDF files", "*.pdf")],
-        initialfile=f"{line}_{destination}_from_{stop_name}.pdf",
+        initialfile=make_filename(url, have_whitespace=True),
         title=f"{line} {destination} from {stop_name}",
         parent=root
     )
@@ -364,11 +376,9 @@ if __name__ == "__main__":
     root.destroy()
 
     if save_path:
-        if export_to_template(url):
-            html_to_pdf(pdf_path=save_path)
-
+        if export_to_template(url) and html_to_pdf(pdf_path=save_path):
             print(f"Timetable for {line} {destination} from {stop_name} has been successfully made")
         else:
-            print("Placeholder error")
+            print("Something went wrong with making this timetable, try again")
     else:
         print("Save cancelled")
