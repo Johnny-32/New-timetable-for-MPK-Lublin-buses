@@ -284,6 +284,10 @@ def parse_special_departures_texts(url):
     return list_of_special_departure_texts
 
 def make_filename(url, have_whitespace):
+    line = parse_line(url)
+    destination = parse_destination(url)
+    stop_name = parse_stop_name(url)
+
     filename = f"{line} {destination} from {stop_name}.pdf"
     if not have_whitespace:
         filename.replace(" ", "_")
@@ -298,10 +302,15 @@ def render_to_file(template_path, output_path, **context):
         f.write(template.render(**context))
 
 def export_to_template(
-        url,
-        html_template="../web/template.html",
-        html_out="../web/test.html",
+    timetable_layout,
+    url,
+    html_out="../web/test.html",
 ):
+    if timetable_layout == 1:
+        html_template = "../web/one_column_template.html"
+    else:
+        html_template = "../web/two_column_template.html"
+
     try:
         render_to_file(
             html_template, html_out,
@@ -339,46 +348,54 @@ def html_to_pdf(html_path="../web/test.html", pdf_path="../web/test.pdf"):
 
 
 # url = "https://mpk.lublin.pl/?przy=1022&lin=032"
-# url = "https://mpk.lublin.pl/?przy=2122&lin=039"
-url = "https://mpk.lublin.pl/?przy=5581&lin=150"
+url = "https://mpk.lublin.pl/?przy=2122&lin=039"
+# url = "https://mpk.lublin.pl/?przy=5581&lin=150"
 
-export_to_template(url)
-html_to_pdf()
+export_to_template(timetable_layout=1 ,url=url)
+# html_to_pdf()
 
-if __name__ == "__main__":
-    # RegEx that will check if the url has a proper structure, it doesn't check whether the url exists
-
-    pattern = r"^(https://mpk\.lublin\.pl/\?przy=\d{4}&lin=[0-9A-Z]{3})"
-
-    while True:
-        url = input("Enter the url of a timetable you want to generate: ").strip()
-        if re.fullmatch(pattern, url):
-            break
-        print("Enter a correct url, try again")
-
-    root = tk.Tk()
-    root.withdraw()
-    root.attributes("-topmost", True)
-    root.update()
-
-    line = parse_line(url)
-    destination = parse_destination(url)
-    stop_name = parse_stop_name(url)
-
-    save_path = filedialog.asksaveasfilename(
-        defaultextension=".pdf",
-        filetypes=[("PDF files", "*.pdf")],
-        initialfile=make_filename(url, have_whitespace=True),
-        title=f"{line} {destination} from {stop_name}",
-        parent=root
-    )
-
-    root.destroy()
-
-    if save_path:
-        if export_to_template(url) and html_to_pdf(pdf_path=save_path):
-            print(f"Timetable for {line} {destination} from {stop_name} has been successfully made")
-        else:
-            print("Something went wrong with making this timetable, try again")
-    else:
-        print("Save cancelled")
+# if __name__ == "__main__":
+#     # RegEx that will check if the url has a proper structure, it doesn't check whether the url exists
+#
+#     url_pattern = r"^(https://mpk\.lublin\.pl/\?przy=\d{4}&lin=[0-9A-Z]{3})"
+#
+#     while True:
+#         url = input("Enter the url of a timetable you want to generate: ").strip()
+#         if re.fullmatch(url_pattern, url):
+#             break
+#         print("Enter a correct url, try again")
+#
+#     timetable_layout_pattern = r"[1-2]{1}"
+#
+#     while True:
+#         timetable_layout = input("Choose timetable layout:\n1 - One column layout\n2 - Two column layout (with street and stop list)").strip()
+#         if re.fullmatch(timetable_layout_pattern, timetable_layout):
+#             break
+#         print("Enter a correct digit, try again")
+#
+#     root = tk.Tk()
+#     root.withdraw()
+#     root.attributes("-topmost", True)
+#     root.update()
+#
+#     line = parse_line(url)
+#     destination = parse_destination(url)
+#     stop_name = parse_stop_name(url)
+#
+#     save_path = filedialog.asksaveasfilename(
+#         defaultextension=".pdf",
+#         filetypes=[("PDF files", "*.pdf")],
+#         initialfile=make_filename(url, have_whitespace=True),
+#         title=f"{line} {destination} from {stop_name}",
+#         parent=root
+#     )
+#
+#     root.destroy()
+#
+#     if save_path:
+#         if export_to_template(timetable_layout=timetable_layout, url=url) and html_to_pdf(pdf_path=save_path):
+#             print(f"Timetable for {line} {destination} from {stop_name} has been successfully made")
+#         else:
+#             print("Something went wrong with making this timetable, try again")
+#     else:
+#         print("Save cancelled")
