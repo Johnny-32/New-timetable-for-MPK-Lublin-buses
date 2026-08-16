@@ -26,7 +26,7 @@ Making a Vienna style timetable
 - Make a variation of Munich's, and maybe make a Copenhagen style timetable for the whole route
 - Test frequency algorithm on a variety of MPK Lublin lines and stops (including these in non-holiday timetables)
 - A website that will display a specific timetable picked by a user, in an HTML format with an option to export to PDF in a print-friendly format
-- Add retrieving data from GTFS instead of .html
+- Add retrieving data from GTFS instead of .html (probably via GTFS-to-HTML)
 - Make a tier list with bus lines (separate tier list for each time ex. weekdays and then maybe group them into categories for ex. key lines have a frequency of 15 minutes during rush hour, 30 minutes on saturdays...)
 
 
