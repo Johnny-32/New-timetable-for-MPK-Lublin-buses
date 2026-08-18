@@ -38,6 +38,46 @@ header {
     }
 }
 
+.street-container {
+    display: flex;
+    
+    /*display: grid;*/
+    /*grid-template-columns: repeat();*/
+    /*ADD stop counter to the template and make the display grid*/
+    
+    font-size: 0.75rem;
+    height: 120px;
+    align-items: flex-end;
+    gap: 1.5rem;
+    padding-left: 1rem;
+    
+    li {
+        width: 0;
+        list-style-type: disc;
+
+        span {
+            display: inline-block;
+            font-style: normal;
+            font-weight: bold;
+            white-space: nowrap;
+            transform-origin: bottom left;
+            rotate: -45deg;
+            translate: 0 -5px;
+        }
+
+        span#current-stop {
+            background-color: black;
+            color: var(--bg-primary);
+            padding: 0.05rem 0.1rem;
+            height: fit-content;
+        }
+    }
+    
+    li:has(span.past-stop) {
+        color: var(--bg-past-stops);
+    }
+}
+
 main {
     display: grid;
     grid-template-columns: repeat(var(--table-count), 1fr);
@@ -49,38 +89,6 @@ main {
 
     p {
         margin-block: 0.1rem;
-    }
-}
-
-#stop-and-street-list {
-    font-size: 0.75rem;
-
-    .street-container {
-        display: flex;        
-
-        li {
-            font-style: normal;
-            font-weight: bold;
-            width: fit-content;
-            
-            translate: 25px 51px;
-            rotate: 315deg;
-        }
-
-        li.past-stop {
-            color: var(--bg-past-stops);
-        }
-
-        li#current-stop {
-            background-color: black;
-            color: var(--bg-primary);
-            padding: 0.05rem 0.1rem;
-            height: fit-content;
-
-            &::marker {
-                color: black;
-            }
-        }
     }
 }
 

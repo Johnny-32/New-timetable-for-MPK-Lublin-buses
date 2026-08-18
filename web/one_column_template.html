@@ -23,12 +23,12 @@
             {% for stop_list in stops_and_streets.values() %}
             {% for stop in stop_list %}
             {% if stop == stop_name %}
-            <li id="current-stop">{{ stop }}</li>
+            <li><span id="current-stop">{{ stop }}</span></li>
             {% set ns.past_stops = false %}
             {% elif ns.past_stops %}
-            <li class="past-stop">{{ stop }}</li>
+            <li><span class="past-stop">{{ stop }}</span></li>
             {% else %}
-            <li class="future-stop">{{ stop }}</li>
+            <li><span class="future-stop">{{ stop }}</span></li>
             {% endif %}
             {% endfor %}
             {% endfor %}
