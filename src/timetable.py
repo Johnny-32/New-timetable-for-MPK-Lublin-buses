@@ -384,7 +384,7 @@ url = "https://mpk.lublin.pl/?przy=2122&lin=039"
 # url = "https://mpk.lublin.pl/?przy=5542&lin=0N2"
 
 export_to_template(timetable_layout=1 ,url=url)
-# html_to_pdf()
+html_to_pdf()
 
 # if __name__ == "__main__":
 #     # RegEx that will check if the url has a proper structure, it doesn't check whether the url exists
