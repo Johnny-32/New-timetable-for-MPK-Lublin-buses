@@ -16,7 +16,9 @@ This project aims to make a better looking and simpler timetable for MPK Lublin 
 ## To do:
 - Make a proper logo with a barcode with my GitHub project url
 - Make a disclaimer on the left, below the stop and street list
-- Make a second version with the stop list in the middle (between the header and the tables) with tilted text (inspired by Viennese timetables)
+- Add a color scheme for night lines (like in Vienna)
+- Add in JS proper height (stop list will take as much space as possible and the text will shrink in order to fit if it's too big)
+- Add in JS proper width (stop list will no longer overflow out of the document)
 
 ## Currently working on:
 Making a Vienna style timetable

@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
     <style>
         body { --table-count: {{ table_dict_list|length }}; }
+        body { --stop-count: {{ num_of_stops }}; }
     </style>
 </head>
 <body>
@@ -20,9 +21,8 @@
     <section id="stop-and-street-list">
         {% set ns = namespace(past_stops=true) %}
         <ul class="street-container">
-            {% for stop_list in stops_and_streets.values() %}
-            {% for stop in stop_list %}
-            {% if stop == stop_name %}
+            {% for stop in stops %}
+            {% if stop == current_stop %}
             <li><span id="current-stop">{{ stop }}</span></li>
             {% set ns.past_stops = false %}
             {% elif ns.past_stops %}
@@ -30,7 +30,6 @@
             {% else %}
             <li><span class="future-stop">{{ stop }}</span></li>
             {% endif %}
-            {% endfor %}
             {% endfor %}
         </ul>
     </section>
@@ -75,7 +74,7 @@
         <div id="right-part">
             <div class="footer-2-part-text-element">
                 <span>Stop:</span>
-                <span class="bold-number">{{ stop_name }}</span>
+                <span class="bold-number">{{ current_stop_with_stop_number }}</span>
             </div>
             <div class="footer-2-part-text-element">
                 <span>Stop ID:</span>

@@ -39,17 +39,14 @@ header {
 }
 
 .street-container {
-    display: flex;
-    
-    /*display: grid;*/
-    /*grid-template-columns: repeat();*/
-    /*ADD stop counter to the template and make the display grid*/
-    
+    display: grid;
+    grid-template-columns: repeat(var(--stop-count), 1fr);
     font-size: 0.75rem;
     height: 120px;
     align-items: flex-end;
     gap: 1.5rem;
     padding-left: 1rem;
+    padding-right: 3rem;
     
     li {
         width: 0;

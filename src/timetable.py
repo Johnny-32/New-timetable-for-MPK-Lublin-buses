@@ -1,6 +1,8 @@
 import os.path
 import re
 from functools import lru_cache
+from shlex import join
+
 from playwright.sync_api import sync_playwright
 import requests
 from bs4 import BeautifulSoup
@@ -195,30 +197,50 @@ def parse_destination(url):
 
     return soup.find("div", class_="rozklad-kierunek").text.replace("Kierunek:", "").strip()
 
-def parse_stop_name(url):
+def parse_current_stop(url, strip_stop_number=True):
     soup = make_a_request(url)
 
-    return soup.select_one("div.rozklad-przystanek > b > a").get_text(strip=True).split("-")[1].strip()
+    current_stop = soup.select_one("div.rozklad-przystanek > b > a").get_text(strip=True).split("-")[1].strip()
+
+    if strip_stop_number:
+        return current_stop.split()[0]
+
+    return current_stop
 
 def parse_stop_id(url):
     soup = make_a_request(url)
 
     return soup.select_one("div.rozklad-przystanek > b > a").get_text(strip=True).split("-")[0].strip()
 
-def parse_stops(url):
-    soup = make_a_request(url)
+# KNOWN BUG: the website doesn't list the last stop for some reason, but I've made it work
+
+def parse_stops(url, strip_stop_id = True, strip_stop_number=True):
+    soup = make_a_request(url, html5lib_parser=True)
 
     stop_list = [
         a.get_text(strip=True)
         for a in soup.select("ul.rozklad-mapa > li:not(.ulica) > a")
     ]
 
+    destination = parse_destination(url)
+    stop_list.append(destination)
+
+    if strip_stop_id:
+         stop_list = [stop.split("-", 1)[1].strip() if len(stop.split("-", 1)) != 1 else stop for stop in stop_list]
+
+    if strip_stop_number:
+        stop_list = [" ".join(stop.split()[:-1]) if stop.split()[-1].isnumeric() else stop for stop in stop_list]
+
     return stop_list
 
 # Returns a dict with street names as keys and stop lists values
 # ex. {"street1": ["stop1", "stop2"], ...}
 
-def parse_stops_and_streets(url, strip_stop_id=True):
+# KNOWN BUG: the website doesn't list the last stop for some reason, I can add it here from another div,
+# but since I'm planning to move to using GTFS instead of parsing a website, there's no point in doing that,
+# also since it would be only a stop, without a corresponding street it could create confusion in 2 column layout.
+
+def parse_stops_and_streets(url, strip_stop_id=True, strip_stop_number=True):
     soup = make_a_request(url, html5lib_parser=True)
 
     li_list = [li for li in soup.select("ul.rozklad-mapa > li")]
@@ -238,6 +260,8 @@ def parse_stops_and_streets(url, strip_stop_id=True):
             stop_name = li.find("a").get_text(strip=True)
             if strip_stop_id:
                 stop_name = stop_name.split("-", 1)[1].strip()
+            if strip_stop_number:
+                stop_name = " ".join(stop_name.split()[:-1]) if stop_name.split()[-1].isnumeric() else stop_name
             street_name_sublist.append(stop_name)
 
     if current_street and street_name_sublist:
@@ -252,7 +276,7 @@ def parse_period(url):
         if "DZIEŃ POWSZEDNI" in span:
             return span.split(",")[1]
 
-    return None
+    return "CAŁOROCZNY"
 
 def make_a_better_span_list(url):
     period = parse_period(url)
@@ -286,13 +310,17 @@ def parse_special_departures_texts(url):
 def make_filename(url, have_whitespace):
     line = parse_line(url)
     destination = parse_destination(url)
-    stop_name = parse_stop_name(url)
+    stop_name = parse_current_stop(url)
 
     filename = f"{line} {destination} from {stop_name}.pdf"
     if not have_whitespace:
         filename.replace(" ", "_")
 
     return filename
+
+def count_stops(url):
+    stops = parse_stops(url)
+    return len(stops)
 
 
 def render_to_file(template_path, output_path, **context):
@@ -306,25 +334,28 @@ def export_to_template(
     url,
     html_out="../web/test.html",
 ):
+    html_template = "../web/one_column_template.html" if timetable_layout == 1 else "../web/two_column_template.html"
+
+    common_kwargs = dict(
+        table_dict_list=make_a_dict_list(url),
+        special_departures=parse_special_departures_texts(url),
+        span_list=make_a_better_span_list(url),
+        timetable_valid_from=parse_timetable_valid_from(url, iso_format=False),
+        line=parse_line(url),
+        destination=parse_destination(url),
+        current_stop=parse_current_stop(url),
+        current_stop_with_stop_number=parse_current_stop(url,strip_stop_number=False),
+        stop_id=parse_stop_id(url),
+        period=parse_period(url),
+    )
+
     if timetable_layout == 1:
-        html_template = "../web/one_column_template.html"
+        layout_kwargs = dict(stops=parse_stops(url), num_of_stops=count_stops(url))
     else:
-        html_template = "../web/two_column_template.html"
+        layout_kwargs = dict(stops_and_streets=parse_stops_and_streets(url))
 
     try:
-        render_to_file(
-            html_template, html_out,
-            table_dict_list = make_a_dict_list(url),
-            special_departures = parse_special_departures_texts(url),
-            span_list = make_a_better_span_list(url),
-            timetable_valid_from = parse_timetable_valid_from(url, iso_format=False),
-            stops_and_streets = parse_stops_and_streets(url),
-            line = parse_line(url),
-            destination = parse_destination(url),
-            stop_name = parse_stop_name(url),
-            stop_id = parse_stop_id(url),
-            period = parse_period(url)
-        )
+        render_to_file(html_template, html_out, **common_kwargs, **layout_kwargs)
     except Exception as e:
         print(f"Failed to export to a template: {e}")
         return None
@@ -350,6 +381,7 @@ def html_to_pdf(html_path="../web/test.html", pdf_path="../web/test.pdf"):
 # url = "https://mpk.lublin.pl/?przy=1022&lin=032"
 url = "https://mpk.lublin.pl/?przy=2122&lin=039"
 # url = "https://mpk.lublin.pl/?przy=5581&lin=150"
+# url = "https://mpk.lublin.pl/?przy=5542&lin=0N2"
 
 export_to_template(timetable_layout=1 ,url=url)
 # html_to_pdf()

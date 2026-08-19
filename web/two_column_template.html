@@ -20,7 +20,7 @@
         <ul class="street-container">
             {% for stop in stop_list %}
             {% if stop == stop_name %}
-            <li id="current-stop">{{ stop }}</li>
+            <li id="current-stop">{{ current_stop }}</li>
             {% set ns.past_stops = false %}
             {% elif ns.past_stops %}
             <li class="past-stop">{{ stop }}</li>
@@ -77,7 +77,7 @@
             <div id="right-part">
                 <div class="footer-2-part-text-element">
                     <span>Stop:</span>
-                    <span class="bold-number">{{ stop_name }}</span>
+                    <span class="bold-number">{{ current_stop_with_stop_number }}</span>
                 </div>
                 <div class="footer-2-part-text-element">
                     <span>Stop ID:</span>
